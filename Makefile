@@ -1,7 +1,7 @@
 CC = gcc
 CXX = g++
 
-TARGET_EXEC := rv32I_emu
+TARGET_EXEC := slash_sim
 
 BUILD_DIR := build
 OUT_DIR := out
@@ -20,7 +20,7 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 # Every folder in ./src will need to be passed to GCC so that it can find header files
-INC_DIRS := inc
+INC_DIRS := inc inc/opcode
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
@@ -63,7 +63,7 @@ debug:
 ASMDIR ?= rv32_asm
 asm:
 	mkdir -p ./$(BUILD_DIR)
-	riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -static -nostdlib -T$(ASMDIR)/$(LD_FILE) $(ASMDIR)/$(ASM).s -o $(BUILD_DIR)/add.elf
+	riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -static -nostdlib -T$(ASMDIR)/$(LD_FILE) $(ASMDIR)/$(ASM).s -o $(BUILD_DIR)/${ASM}.elf
 	riscv64-unknown-elf-objcopy -O binary $(BUILD_DIR)/$(ASM).elf $(BUILD_DIR)/$(ASM).bin
 
 -include $(DEPS)
