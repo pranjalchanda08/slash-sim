@@ -1,6 +1,6 @@
-# RV32I ISA Emulator
+# Slash Sim
 
-C based RISC-V 32i ISA emulator
+Slash Sim is a simple C based RV32 Instruction set simulator. This can be used to simulate any binary file that is compiled using RISCV toolchain.
 
 ## Prerequisits
 ```sh
