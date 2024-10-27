@@ -64,10 +64,17 @@ static void rv32_ram_dump(char const *asm_name)
 static void rv32_cpu_reg_dump(char const *asm_name)
 {
     char *out_file_path = malloc(strlen(asm_name) + 20);
-    sprintf(out_file_path, "out/%s/reg_dump.bin", asm_name);
+    char *line = malloc(100);
+    sprintf(out_file_path, "out/%s/reg_dump.txt", asm_name);
     printf("Saving REG Dump: %s\n", out_file_path);
-    FILE *mem = fopen(out_file_path, "wb");
-    fwrite(g_rv32i_ctx, sizeof(rv32i_ctx_t), 1, mem);
+    FILE *mem = fopen(out_file_path, "w");
+    for (size_t i = 0; i < sizeof(rv32i_ctx_t)/sizeof(uint32_t); i++)
+    {
+        sprintf(line, "%4s: 0x%08x\n", reg_name_list[i], *((uint32_t*)g_rv32i_ctx + i));
+        fputs(line, mem);
+    }
+    free(line);
+    free(out_file_path);
     fclose(mem);
 }
 
