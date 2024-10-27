@@ -14,6 +14,14 @@ const char *reg_name_list[] =
      "s9", "s10", "s11", "t3", "t4", 
      "t5", "t6"};
 
+const char *csr_reg_list[] = {
+    "mstatus", "misa", "mie", "mtvec", "mepc",
+    "mcause", "mbadaddr", "mscratch", "mcycle", "mtime",
+    "mtimecmp", "mimask", "mip", "msip", "mcountinhibit",
+    "mhartid",
+};
+
+
 static uint32_t get_i(uint32_t wc)
 {
     wc = RV_MASK_I(wc);
@@ -51,6 +59,11 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
                 out += sprintf(out, "0x%x", imm);
                 ptr += 2;
             }
+            else if (strncmp(ptr, "$csr", 4) == 0)
+            {
+                out += sprintf(out, "%s", csr_reg_list[rd]);
+                ptr += 4;
+            }
             else
             {
                 *out++ = *ptr++; // Copy character as-is
@@ -64,6 +77,7 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
     *out = '\0'; // Null-terminate the string
     printf("%s", formatted); // Print the final formatted string
 }
+
 
 static exec_args_t args;
 union type
@@ -127,9 +141,9 @@ void rv32_decode(uint32_t word)
     type_u.wordcode = word;
     const char *dec_str;
     exec exec_cb;
-    memset(&args, 0, sizeof(args));
+    memset(&args, 0, sizeof(args)); 
     for (size_t i = 0; i < opcode_list_len; i++)
-    {
+    {   
         if (type_u.u_j_word._wordcode_u._rv_if_u.opcode == opcode_reg_list[i].code)
         {
             exec_cb = opcode_reg_list[i].exec_cb;
@@ -166,7 +180,6 @@ void rv32_decode(uint32_t word)
                     }
                 }
             }
-
             break;
         }
     }
