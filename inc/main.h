@@ -4,6 +4,7 @@
 #include "string.h"
 #include "inttypes.h"
 #include "ram.h"
+#include "elf_reader.h"
 #include "rv32I_struct.h"
 #include "rv32i_fetch_decode.h"
 #include "rv32i_execute.h"

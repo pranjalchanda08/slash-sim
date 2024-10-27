@@ -1,17 +1,21 @@
 #include "main.h"
 
+static ram_t *ram;
 rv32i_ctx_t *g_rv32i_ctx;
-ram_t g_dram_mem;
-ram_t g_iram_mem;
+static rv_elf_section_info sections;
 
 static void rv32_ram_attach()
 {
-    init_ram(RAM_SIZE);
-    printf("RAM Init done\n");
-    ram_space_reg(&g_iram_mem, IRAM_SIZE, IRAM_BASE);
-    printf("IRAM Space Allocation done: s:0x%x, b:0x%x \n", IRAM_SIZE, IRAM_BASE);
-    ram_space_reg(&g_dram_mem, DRAM_SIZE, DRAM_BASE);
-    printf("DRAM Space Allocation done: s:0x%x, b:0x%x \n", DRAM_SIZE, DRAM_BASE);
+    ram = init_ram(RAM_SIZE);
+    if (ram)
+    {
+        printf("RAM Init done\n");
+    }
+    else
+    {
+        printf("[E: ] RAM Init Failed\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 static void rv32_ram_detach()
@@ -20,26 +24,26 @@ static void rv32_ram_detach()
     deinit_ram();
 }
 
-static uint32_t rv32_ram_store_ibin(char const *file_path)
+static uint32_t rv32_ram_store_elf(char const *file_path)
 {
-    FILE *ibin = fopen(file_path, "rb");
-    if (!ibin)
+    FILE *elf = fopen(file_path, "rb");
+    if (!elf)
     {
         printf("Error reading bin file \n");
         exit(1);
     }
     else
-        printf("ibin found. Reading %s\n", file_path);
-    uint32_t iword = 0;
-    uint32_t imem_addr = IRAM_BASE;
+        printf("ELF found. Reading %s\n", file_path);
 
-    while (fread(&iword, sizeof(uint32_t), 1, ibin))
+    uint32_t imem_addr = 0;
+
+    if (EXIT_SUCCESS != read_elf(elf, (size_t *)&imem_addr, ram))
     {
-        ram_store(&g_iram_mem, imem_addr, 32, iword);
-        imem_addr += sizeof(uint32_t);
+        printf("[E] : Read ELF Error\n");
+        exit(EXIT_FAILURE);
     }
-    printf("Reading binary Success. Max Addr: 0x%0x\n", imem_addr);
-    fclose(ibin);
+
+    printf("Reading binary Success. PC: 0x%0x\n", imem_addr);
     return imem_addr;
 }
 
@@ -53,7 +57,7 @@ static void rv32_ram_dump(char const *asm_name)
     uint32_t imem_addr = 0;
     while (imem_addr < RAM_SIZE)
     {
-        buff = ram_load(&g_iram_mem, imem_addr, 8);
+        buff = ram_load(ram, imem_addr, 8);
         imem_addr++;
         fwrite(&buff, sizeof(uint8_t), 1, mem);
     }
@@ -93,11 +97,11 @@ int main(int argc, char const *argv[])
     printf("rv32I emu Startup \n");
     rv32_ram_attach();
     /* Read instruction and data binary and save it to the ram instance */
-    rv32_ram_store_ibin(argv[1]);
-    g_rv32i_ctx = (rv32i_ctx_t *) malloc(sizeof(rv32i_ctx_t));
+    uint32_t entry_point = rv32_ram_store_elf(argv[1]);
+    g_rv32i_ctx = (rv32i_ctx_t *)malloc(sizeof(rv32i_ctx_t));
     memset(g_rv32i_ctx, 0, sizeof(rv32i_ctx_t));
     printf("\n-------------- Execution Start --------------\n");
-    rv32_fetch(&g_iram_mem);
+    rv32_fetch(ram, entry_point);
     printf("-------------- Execution End ----------------\n\n");
 
     rv32_ram_dump(argv[2]);
