@@ -8,6 +8,8 @@ _start:
     la sp, stack_top
     li t0, 0x13
     li t1, 0x23
+    csrw mstatus, t6
+    ecall
     add t2, t0, t1
     la t4, msg
 
