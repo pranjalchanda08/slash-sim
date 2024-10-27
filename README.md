@@ -23,7 +23,7 @@ $ make asm ASM={asm_name}
 
 ## Run
 ```sh
-$ make run ARGS={path_to_asm.bin} ASM={asm_name}
+$ make run ARGS={path_to_asm.elf} ASM={asm_name}
 ```
 
 ## Example run
@@ -74,23 +74,21 @@ SECTIONS
 }
 
 ```
-#### Build add.bin and rv32I_emu
+#### Build add.bin and slash_sim
 ```sh
 $ make clean
 $ make
 $ make asm ASM=add
 ```
-#### Run rv32I_emu
+#### Run slash_sim
 ```sh
-$ make run ARGS=build/add.bin ASM=add
+$ make run ARGS=build/add.elf ASM=add
 ```
 
 #### Output
 ```sh
-$ make run ARGS=build/add.elf ASM=add
-mkdir -p out/add
-./build/slash_sim build/add.elf add
-rv32I emu Startup 
+$ ./build/slash_sim build/add.elf add
+Slash-Sim Startup 
 RAM Init done
 ELF found. Reading build/add.elf
 ==================================================
@@ -102,7 +100,7 @@ ELF found. Reading build/add.elf
 Extracted binary data for section: .text
 Extracted binary data for section: .data
 Total Memory Layout Size: 0x1011 bytes
-Reading binary Success. Max Addr: 0x1000
+Reading binary Success. PC: 0x1000
 
 -------------- Execution Start --------------
 
