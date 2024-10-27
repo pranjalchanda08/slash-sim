@@ -10,7 +10,7 @@ _start:
     li t1, 0x23
     add t2, t0, t1
     la t4, msg
-    
+
 .section .data
 msg:
     .string "Pranjal\n"
