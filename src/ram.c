@@ -4,7 +4,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-uint8_t *ram_mem;
+ram_t g_ram;
 
 static uint8_t dram_load_8(ram_t *ram, uint32_t addr)
 {
@@ -39,32 +39,25 @@ static void dram_store_32(ram_t *ram, uint32_t addr, uint32_t value)
     ram->mem[addr + 3] = (uint8_t)((value >> 24) & 0xff);
 }
 
-void init_ram(size_t ram_size)
+ram_t * init_ram(size_t ram_size)
 {
-    ram_mem = (uint8_t *)malloc(ram_size);
+    g_ram.mem = (uint8_t *)malloc(ram_size);
+    g_ram.mem_size = ram_size;
+    return &g_ram;
 }
 
 void deinit_ram()
 {
-    free(ram_mem);
-}
-
-void ram_space_reg(ram_t *ram, size_t size, size_t base_addr)
-{
-    ram->mem_size = size;
-    ram->base = base_addr;
-    ram->mem = ram_mem;
-}
-
-void ram_space_free(ram_t *ram)
-{
-    ram->mem_size = 0;
-    ram->base = 0;
-    memset(ram->mem, 0, ram->mem_size);
+    free(g_ram.mem);
 }
 
 uint32_t ram_load(ram_t *ram, uint32_t addr, uint32_t size)
 {
+    if (addr >= ram->mem_size)
+    {
+        printf("[E] : Memory access out of bound\n");
+    }
+    
     switch (size)
     {
     case 8:
@@ -84,6 +77,11 @@ uint32_t ram_load(ram_t *ram, uint32_t addr, uint32_t size)
 
 void ram_store(ram_t *ram, uint32_t addr, uint32_t size, uint32_t value)
 {
+    if (addr >= ram->mem_size)
+    {
+        printf("[E] : Memory access out of bound\n");
+    }
+    
     switch (size)
     {
     case 8:

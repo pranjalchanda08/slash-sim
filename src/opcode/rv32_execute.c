@@ -11,7 +11,6 @@ uint32_t execute_auipc(exec_args_t *args)
     args->c_ctx->cpu_r_u.xn[args->rd] = args->c_ctx->pc + args->imm;
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
-
 uint32_t execute_jal(exec_args_t *args)
 {
     args->c_ctx->cpu_r_u.xn[args->rd] = args->c_ctx->pc + RV32_PC_JUMP;
@@ -134,19 +133,19 @@ uint32_t execute_alui_i2_srli(exec_args_t *args)
 
 uint32_t execute_store_s_sb(exec_args_t *args)
 {
-    ram_store(&g_dram_mem, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 8, args->rs2 & 0x000000FF);
+    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 8, args->rs2 & 0x000000FF);
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
 uint32_t execute_store_s_sh(exec_args_t *args)
 {
-    ram_store(&g_dram_mem, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 16, args->rs2 & 0x0000FFFF);
+    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 16, args->rs2 & 0x0000FFFF);
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
 uint32_t execute_store_s_sw(exec_args_t *args)
 {
-    ram_store(&g_dram_mem, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 32, args->rs2 & 0xFFFFFFFF);
+    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 32, args->rs2 & 0xFFFFFFFF);
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
@@ -169,7 +168,7 @@ uint32_t execute_load(exec_args_t *args)
         /* lb (rd = mmio8(rs1+imm_1)) */
         args->c_ctx->cpu_r_u.xn[args->rd] = 0xFFFFFF00;
         args->c_ctx->cpu_r_u.xn[args->rd] |=
-            ram_load(&g_dram_mem,
+            ram_load(args->ram,
                      args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm,
                      8);
         break;
@@ -177,7 +176,7 @@ uint32_t execute_load(exec_args_t *args)
         /* lbu (rd = mmio8(rs1+imm_1)) */
         args->c_ctx->cpu_r_u.xn[args->rd] = 0x00000000;
         args->c_ctx->cpu_r_u.xn[args->rd] |=
-            ram_load(&g_dram_mem,
+            ram_load(args->ram,
                      args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm,
                      8);
         break;
@@ -185,7 +184,7 @@ uint32_t execute_load(exec_args_t *args)
         /* lh (rd = mmio16(rs1+imm_1)) */
         args->c_ctx->cpu_r_u.xn[args->rd] = 0xFFFFFF00;
         args->c_ctx->cpu_r_u.xn[args->rd] |=
-            ram_load(&g_dram_mem,
+            ram_load(args->ram,
                      args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm,
                      16);
         break;
@@ -193,7 +192,7 @@ uint32_t execute_load(exec_args_t *args)
         /* lhu (rd = mmio16(rs1+imm_1)) */
         args->c_ctx->cpu_r_u.xn[args->rd] = 0x00000000;
         args->c_ctx->cpu_r_u.xn[args->rd] |=
-            ram_load(&g_dram_mem,
+            ram_load(args->ram,
                      args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm,
                      16);
         break;
@@ -201,7 +200,7 @@ uint32_t execute_load(exec_args_t *args)
         /* lw (rd = mmio16(rs1+imm_1)) */
         args->c_ctx->cpu_r_u.xn[args->rd] = 0xFFFFFF00;
         args->c_ctx->cpu_r_u.xn[args->rd] |=
-            ram_load(&g_dram_mem,
+            ram_load(args->ram,
                      args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm,
                      32);
         break;

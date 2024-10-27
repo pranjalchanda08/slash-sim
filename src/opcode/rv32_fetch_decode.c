@@ -122,7 +122,7 @@ void decode_type(ins_type_t ins_type)
     }
 }
 
-void rv32_decode(uint32_t word)
+void rv32_decode(uint32_t word, ram_t *ram)
 {
     type_u.wordcode = word;
     const char *dec_str;
@@ -172,6 +172,7 @@ void rv32_decode(uint32_t word)
     }
     decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm);
     args.c_ctx = g_rv32i_ctx;
+    args.ram = ram;
     if(!exec_cb)
     {
         printf("\n[E]: No callback regiterd to perform execution\n");
@@ -181,20 +182,20 @@ void rv32_decode(uint32_t word)
     g_rv32i_ctx->pc = exec_cb(&args);
 }
 
-void rv32_fetch(ram_t *iram)
+void rv32_fetch(ram_t *ram, uint32_t pc)
 {
     /* Initialise PC */
-    g_rv32i_ctx->pc = iram->base;
+    g_rv32i_ctx->pc = pc;
     uint32_t wordcode;
     while (1)
     {
-        wordcode = ram_load(iram, g_rv32i_ctx->pc, 32);
+        wordcode = ram_load(ram, g_rv32i_ctx->pc, 32);
         printf("\n[0x%08X]: [PC:0x%08X]: ", wordcode, g_rv32i_ctx->pc);
         if (!wordcode)
         {
             printf("PC reached EOF\n");
             break;
         }
-        rv32_decode(wordcode);
+        rv32_decode(wordcode, ram);
     }
 }

@@ -139,6 +139,7 @@ typedef struct exec_args
     uint32_t fn7;
     ins_type_t ins_type;
     rv32i_ctx_t *c_ctx;
+    void * ram;
 } exec_args_t;
 
 typedef uint32_t (*exec)(exec_args_t *args);
