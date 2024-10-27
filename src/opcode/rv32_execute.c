@@ -152,53 +152,22 @@ uint32_t execute_store_s_sw(exec_args_t *args)
 
 
 
-uint32_t execute_csr(exec_args_t *args)
-{
-    uint32_t csr_address = args->imm; // CSR address to access
-    // printf("\ni am geetiing called\n");
-    
-    // printf(" args-> fn3 : 0x%x\n" , args->fn3);
-    // not completed!
+uint32_t execute_csr(exec_args_t *args) {
+    uint32_t csr_address = args->imm; 
+    uint32_t csr_value = args->c_ctx->cpu_r_u.xn[args->rd];
     switch (args->fn3) {
-        case 0x00: // CSRRW (atomic read and write)
-            // Write value from rs1 to the CSR and return previous value in rd
-            args->c_ctx->cpu_r_u.xn[args->rd] = ram_load(&g_iram_mem, csr_address, 32);
-            ram_store(&g_iram_mem, csr_address, 32, args->c_ctx->cpu_r_u.xn[args->rs1]);
+        case 0x01: 
+            args->c_ctx->cpu_r_u.xn[args->rd] = csr_value | args->c_ctx->cpu_r_u.xn[args->rs1];
             break;
-
-        case 0x01: // CSRRS (atomic read and set)
-            // Read current value of CSR and set bits specified by rs1
-            // printf("csrr \n");
-            args->c_ctx->cpu_r_u.xn[args->rd] = ram_load(&g_iram_mem, csr_address, 32);
-            ram_store(&g_iram_mem, csr_address, 32, args->c_ctx->cpu_r_u.xn[args->rd] | args->c_ctx->cpu_r_u.xn[args->rs1]);
+        case 0x02: 
+            args->c_ctx->cpu_r_u.xn[args->rd] = csr_value;
             break;
-
-        // case 0x02: // CSRRC (atomic read and clear)
-        //     // Read current value of CSR and clear bits specified by rs1
-        //     args->c_ctx->cpu_r_u.xn[args->rd] = ram_load(&g_iram_mem, csr_address, 32);
-        //     ram_store(&g_iram_mem, csr_address, 32, args->c_ctx->cpu_r_u.xn[args->rd] & ~args->c_ctx->cpu_r_u.xn[args->rs1]);
-        //     break;
-
-        case 0x03: // CSRRWI (atomic read and immediate write)
-            args->c_ctx->cpu_r_u.xn[args->rd] = ram_load(&g_iram_mem, csr_address, 32);
-            ram_store(&g_iram_mem, csr_address, 32, args->imm); // Write immediate value to CSR
+        case 0x03: 
+            args->c_ctx->cpu_r_u.xn[args->rd] = csr_value & ~args->c_ctx->cpu_r_u.xn[args->rs1];
             break;
-
-        case 0x04: // CSRRSI (atomic read and immediate set)
-            args->c_ctx->cpu_r_u.xn[args->rd] = ram_load(&g_iram_mem, csr_address, 32);
-            ram_store(&g_iram_mem, csr_address, 32, args->c_ctx->cpu_r_u.xn[args->rd] | args->imm); // Set bits specified by immediate
-            break;
-
-        case 0x05: // CSRRCI (atomic read and immediate clear)
-            args->c_ctx->cpu_r_u.xn[args->rd] = ram_load(&g_iram_mem, csr_address, 32);
-            ram_store(&g_iram_mem, csr_address, 32, args->c_ctx->cpu_r_u.xn[args->rd] & ~args->imm); // Clear bits specified by immediate
-            break;
-
         default:
-        
             break;
     }
-    
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 

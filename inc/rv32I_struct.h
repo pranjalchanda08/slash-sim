@@ -86,12 +86,12 @@ typedef struct _rv_if_r
         uint32_t wordcode;
         struct _rv_if_r_struct
         {
-            uint32_t opcode : 7; // 0-7 bit will contain opcode
-            uint32_t rd : 5;     // 7:11 will tell destination
-            uint32_t fn3 : 3;    // 12:14 will act as funtion field
-            uint32_t rs1 : 5;   // 15:19 source register
-            uint32_t rs2 : 5;   // 20:24 source register
-            uint32_t fn7 : 7;  // 25:31 other funtion field 
+            uint32_t opcode : 7; 
+            uint32_t rd : 5;     
+            uint32_t fn3 : 3;    
+            uint32_t rs1 : 5;   
+            uint32_t rs2 : 5;   
+            uint32_t fn7 : 7;  
         } _rv_if_r;
     } _wordcode_u;
 } rv_if_r_t;
@@ -99,7 +99,7 @@ typedef struct _rv_if_r
 typedef struct _rv_if_i1
 {
 
-    // CSR will fall under this category !!
+
     union _wordcode_i1
     {
         uint32_t wordcode;
