@@ -2,3 +2,4 @@
 
 void rv32_fetch(ram_t *iram);
 void rv32_decode(uint32_t word);
+int rv32_get_csr_index(uint32_t csr_address);
