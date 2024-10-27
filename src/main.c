@@ -94,7 +94,7 @@ int main(int argc, char const *argv[])
         printf("ASM name not provided\n");
         return 1;
     }
-    printf("rv32I emu Startup \n");
+    printf("Slash-Sim Startup \n");
     rv32_ram_attach();
     /* Read instruction and data binary and save it to the ram instance */
     uint32_t entry_point = rv32_ram_store_elf(argv[1]);
