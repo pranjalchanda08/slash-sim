@@ -169,9 +169,9 @@ void rv32_decode(uint32_t word, ram_t *ram)
     type_u.wordcode = word;
     const char *dec_str;
     exec exec_cb;
-    memset(&args, 0, sizeof(args));
+    memset(&args, 0, sizeof(args)); 
     for (size_t i = 0; i < opcode_list_len; i++)
-    {
+    {   
         if (type_u.u_j_word._wordcode_u._rv_if_u.opcode == opcode_reg_list[i].code)
         {
             exec_cb = opcode_reg_list[i].exec_cb;
