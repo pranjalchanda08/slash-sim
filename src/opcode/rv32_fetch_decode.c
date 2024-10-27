@@ -53,12 +53,13 @@ static csr_t csr_list[] = {
 
 
 
-const char *csr_reg_list[] = {
-    "mstatus", "misa", "mie", "mtvec", "mepc",
-    "mcause", "mbadaddr", "mscratch", "mcycle", "mtime",
-    "mtimecmp", "mimask", "mip", "msip", "mcountinhibit",
-    "mhartid",
-};
+const char *csr_reg_list[] = {"mstatus", "misa", "mie",
+ "mtvec", "mtvt", "mstatush", "mcountinhibit", "mhpmevent3",
+  "mhpmevent31", "mscratch", "mepc", "mcause", "mtval", "mip",
+   "mnxti", "mintthresh", "mscratchcswl", "tselect", "tdata1", "tdata2",
+    "tinfo", "dcsr", "dpc", "dscratch0", "dscratch1", "mcycle", "minstret"};
+
+
 
 
 static uint32_t get_i(uint32_t wc)
