@@ -51,17 +51,6 @@ static csr_t csr_list[] = {
     { 0xB02, &(g_rv32i_csr.minstret) }
 };
 
-
-
-const char *csr_reg_list[] = {"mstatus", "misa", "mie",
- "mtvec", "mtvt", "mstatush", "mcountinhibit", "mhpmevent3",
-  "mhpmevent31", "mscratch", "mepc", "mcause", "mtval", "mip",
-   "mnxti", "mintthresh", "mscratchcswl", "tselect", "tdata1", "tdata2",
-    "tinfo", "dcsr", "dpc", "dscratch0", "dscratch1", "mcycle", "minstret"};
-
-
-
-
 static uint32_t get_i(uint32_t wc)
 {
     wc = RV_MASK_I(wc);
@@ -101,7 +90,7 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
             }
             else if (strncmp(ptr, "$csr", 4) == 0)
             {
-        
+
                 out += sprintf(out, "%s", csr_reg_list[csr_index]);
                 ptr += 4;
             }
@@ -180,9 +169,9 @@ void rv32_decode(uint32_t word, ram_t *ram)
     type_u.wordcode = word;
     const char *dec_str;
     exec exec_cb;
-    memset(&args, 0, sizeof(args)); 
+    memset(&args, 0, sizeof(args));
     for (size_t i = 0; i < opcode_list_len; i++)
-    {   
+    {
         if (type_u.u_j_word._wordcode_u._rv_if_u.opcode == opcode_reg_list[i].code)
         {
             exec_cb = opcode_reg_list[i].exec_cb;
