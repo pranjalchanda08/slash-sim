@@ -11,6 +11,7 @@
 #include "platmem.h"
 
 extern rv32i_ctx_t * g_rv32i_ctx;
+extern rv32i_csr_t  g_rv32i_csr;
 extern ram_t g_dram_mem;
 extern ram_t g_iram_mem;
 extern const char *reg_name_list[];
