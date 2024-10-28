@@ -1,24 +1,55 @@
 #include "main.h"
-
+#include "rv32I_struct.h"
 #define MAX_OUTPUT_SIZE 256
 
 extern size_t opcode_list_len;
 extern rv32_opcode_reg_t opcode_reg_list[];
 
 const char *reg_name_list[] =
-    {"x0", "ra", "sp", "gp", "tp", 
-     "t0", "t1", "t2", "s0", "s1", 
-     "a0", "a1", "a2", "a3", "a4", 
-     "a5", "a6", "a7", "s2", "s3", 
-     "s4", "s5", "s6", "s7", "s8", 
-     "s9", "s10", "s11", "t3", "t4", 
+    {"x0", "ra", "sp", "gp", "tp",
+     "t0", "t1", "t2", "s0", "s1",
+     "a0", "a1", "a2", "a3", "a4",
+     "a5", "a6", "a7", "s2", "s3",
+     "s4", "s5", "s6", "s7", "s8",
+     "s9", "s10", "s11", "t3", "t4",
      "t5", "t6", "pc"};
 
-const char *csr_reg_list[] = {"mstatus", "misa", "mie",
- "mtvec", "mtvt", "mstatush", "mcountinhibit", "mhpmevent3",
-  "mhpmevent31", "mscratch", "mepc", "mcause", "mtval", "mip",
-   "mnxti", "mintthresh", "mscratchcswl", "tselect", "tdata1", "tdata2",
-    "tinfo", "dcsr", "dpc", "dscratch0", "dscratch1", "mcycle", "minstret"};
+const char *csr_reg_list[] = {
+    "mstatus", "misa", "mie", "mtvec", "mtvt", "mstatush", "mcountinhibit",
+    "mcycle", "mhpmevent31", "mscratch", "mepc", "mcause", "mtval", "mip",
+    "mnxti", "mintthresh", "mscratchcswl", "tselect", "tdata1", "tdata2",
+    "tinfo", "dcsr", "dpc", "dscratch0", "dscratch1", "mcycle", "minstret"
+};
+
+static csr_t csr_list[] = {
+    { 0x300, &(g_rv32i_csr.mstatus) },
+    { 0x301, &(g_rv32i_csr.misa) },
+    { 0x304, &(g_rv32i_csr.mie) },
+    { 0x305, &(g_rv32i_csr.mtvec) },
+    { 0x307, &(g_rv32i_csr.mtvt) },
+    { 0x310, &(g_rv32i_csr.mstatush) },
+    { 0x320, &(g_rv32i_csr.mcountinhibit) },
+    { 0xB00, &(g_rv32i_csr.mcycle) },
+    { 0x323, &(g_rv32i_csr.mhpmevent31) },
+    { 0x340, &(g_rv32i_csr.mscratch) },
+    { 0x341, &(g_rv32i_csr.mepc) },
+    { 0x342, &(g_rv32i_csr.mcause) },
+    { 0x343, &(g_rv32i_csr.mtval) },
+    { 0x344, &(g_rv32i_csr.mip) },
+    { 0x345, &(g_rv32i_csr.mnxti) },
+    { 0x346, &(g_rv32i_csr.mintthresh) },
+    { 0x348, &(g_rv32i_csr.mscratchcswl) },
+    { 0x7A0, &(g_rv32i_csr.tselect) },
+    { 0x7A1, &(g_rv32i_csr.tdata1) },
+    { 0x7A2, &(g_rv32i_csr.tdata2) },
+    { 0x7A4, &(g_rv32i_csr.tinfo) },
+    { 0x7B0, &(g_rv32i_csr.dcsr) },
+    { 0x7B1, &(g_rv32i_csr.dpc) },
+    { 0x7B2, &(g_rv32i_csr.dscratch0) },
+    { 0x7B3, &(g_rv32i_csr.dscratch1) },
+    { 0xB00, &(g_rv32i_csr.mcycle) },
+    { 0xB02, &(g_rv32i_csr.minstret) }
+};
 
 
 
@@ -62,7 +93,6 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
             }
             else if (strncmp(ptr, "$csr", 4) == 0)
             {
-            // int index = 
             out += sprintf(out, "%s", csr_reg_list[csr_index]);
                 ptr += 4;
             }
@@ -143,9 +173,9 @@ void rv32_decode(uint32_t word, ram_t *ram)
     type_u.wordcode = word;
     const char *dec_str;
     exec exec_cb;
-    memset(&args, 0, sizeof(args)); 
+    memset(&args, 0, sizeof(args));
     for (size_t i = 0; i < opcode_list_len; i++)
-    {   
+    {
         if (type_u.u_j_word._wordcode_u._rv_if_u.opcode == opcode_reg_list[i].code)
         {
             exec_cb = opcode_reg_list[i].exec_cb;
@@ -186,18 +216,19 @@ void rv32_decode(uint32_t word, ram_t *ram)
         }
     }
     uint32_t csr_instruction= (type_u.wordcode >> 20) & 0xFFF;
-    uint32_t csr_index = rv32_get_csr_index(csr_instruction);
-
-    decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm , csr_index);
+    args.csr_index = rv32_get_csr_index(csr_instruction);
+    decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm , args.csr_index);
     args.c_ctx = g_rv32i_ctx;
     args.ram = ram;
+
+    args.csr_ctx =  csr_list;
     if(!exec_cb)
     {
         printf("\n[E]: No callback regiterd to perform execution\n");
         g_rv32i_ctx += RV32_PC_JUMP;
         return;
     }
-    g_rv32i_ctx->pc = exec_cb(&args);
+    g_rv32i_ctx->pc = exec_cb(&args); //
 }
 
 void rv32_fetch(ram_t *ram, uint32_t pc)
@@ -218,40 +249,13 @@ void rv32_fetch(ram_t *ram, uint32_t pc)
     }
 }
 
-
 int rv32_get_csr_index(uint32_t csr_address) {
-
-    switch (csr_address) {
-        case CSR_MSTATUS:       return 0; // mstatus
-        case CSR_MISA:         return 1; // misa
-        case CSR_MIE:          return 2; // mie
-        case CSR_MTVEC:        return 3; // mtvec
-        case CSR_MTVT:         return 4; // mtvt
-        case CSR_MSTATUSH:     return 5; // mstatush
-        case CSR_MCOUNTINHIBIT: return 6; // mcountinhibit
-        case CSR_MHPMEVENT3:   return 7; // mhpmevent3
-        case CSR_MHPMEVENT31:  return 8; // mhpmevent31
-        case CSR_MSCRATCH:     return 9; // mscratch
-        case CSR_MEPC:         return 10; // mepc
-        case CSR_MCAUSE:       return 11; // mcause
-        case CSR_MTVAL:        return 12; // mtval
-        case CSR_MIP:          return 13; // mip
-        case CSR_MNXTI:         return 14; // mnxti
-        case CSR_MINTTHRESH:   return 15; // mintthresh
-        case CSR_MSCRATCHCSWL: return 16; // mscratchcswl
-        case CSR_TSELECT:      return 17; // tselect
-        case CSR_TDATA1:       return 18; // tdata1
-        case CSR_TDATA2:       return 19; // tdata2
-        case CSR_TINFO:        return 20; // tinfo
-        case CSR_DCSR:         return 21; // dcsr
-        case CSR_DPC:          return 22; // dpc
-        case CSR_DSATCH0:     return 23; // dscratch0
-        case CSR_DSATCH1:     return 24; // dscratch1
-        case CSR_MCYCLE:       return 25; // mcycle
-        case CSR_MINSTRET:     return 26; // minstret
-
-     // .. i will add those later
-        default:               return -1; // Unknown CSR
+    size_t num_csrs = sizeof(csr_list) / sizeof(csr_list[0]);
+    for (size_t i = 0; i < num_csrs; i++) {
+        if (csr_list[i].address == csr_address) {
+            return i;
+        }
     }
+    return -1;
 }
 

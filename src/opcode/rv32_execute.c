@@ -150,25 +150,27 @@ uint32_t execute_store_s_sw(exec_args_t *args)
 }
 
 
-
 uint32_t execute_csr(exec_args_t *args) {
-    uint32_t csr_address = args->imm; 
-    uint32_t csr_value = args->c_ctx->cpu_r_u.xn[args->rd];
-    switch (args->fn3) {
-        case 0x01: 
-            args->c_ctx->cpu_r_u.xn[args->rd] = csr_value | args->c_ctx->cpu_r_u.xn[args->rs1];
-            break;
-        case 0x02: 
-            args->c_ctx->cpu_r_u.xn[args->rd] = csr_value;
-            break;
-        case 0x03: 
-            args->c_ctx->cpu_r_u.xn[args->rd] = csr_value & ~args->c_ctx->cpu_r_u.xn[args->rs1];
-            break;
-        default:
-            break;
-    }
+    uint32_t csr_address = args->imm;
+    uint32_t rs1_value = args->c_ctx->cpu_r_u.xn[args->rs1];
+            switch (args->fn3) {
+                case 0x01:
+                    *(args->csr_ctx[args->csr_index].value) = rs1_value;
+                    break;
+                case 0x02:
+                    args->c_ctx->cpu_r_u.xn[args->rd] = *(args->csr_ctx[args->csr_index].value);
+                    break;
+                case 0x03:
+                    *(args->csr_ctx[args->csr_index].value) &= ~rs1_value;
+                    break;
+            }
+
+
+
+
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
+
 
 uint32_t execute_load(exec_args_t *args)
 {
