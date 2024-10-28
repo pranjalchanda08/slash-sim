@@ -53,6 +53,7 @@ static csr_t csr_list[] = {
 
 
 
+
 static uint32_t get_i(uint32_t wc)
 {
     wc = RV_MASK_I(wc);
@@ -92,7 +93,6 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
             }
             else if (strncmp(ptr, "$csr", 4) == 0)
             {
-            // int index =
             out += sprintf(out, "%s", csr_reg_list[csr_index]);
                 ptr += 4;
             }
@@ -109,6 +109,8 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
     *out = '\0'; // Null-terminate the string
     printf("%s", formatted); // Print the final formatted string
 }
+
+
 static exec_args_t args;
 union type
 {

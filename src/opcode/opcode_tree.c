@@ -32,13 +32,9 @@ rv32_opcode_sub_fn_t store_sub_list[] = {
 };
 
 rv32_opcode_sub_fn_t csr_sub_list[] = {
-RV32_SUB_FUNC_ENTRY(0x01, 0x73, RV_INS_TYPE_I1, execute_csr, "csrw\t$csr, $rs1"),      // csrw
-RV32_SUB_FUNC_ENTRY(0x02, 0x73, RV_INS_TYPE_I1, execute_csr, "csrr\t$rd, $csr"),       // csrr
-RV32_SUB_FUNC_ENTRY(0x04, 0x73, RV_INS_TYPE_I1, execute_csr, "csrc\t$csr, $rs1"),      // csrc
-RV32_SUB_FUNC_ENTRY(0x05, 0x73, RV_INS_TYPE_I1, execute_csr, "csrs\t$csr, $rs1"),      // csrs
-RV32_SUB_FUNC_ENTRY(0x01, 0x00, RV_INS_TYPE_I1, execute_csr, "ebreak "),               // ebreak
-RV32_SUB_FUNC_ENTRY(0x00, 0x00, RV_INS_TYPE_I1, execute_csr, "ecall "),                // ecall
-
+RV32_SUB_FUNC_ENTRY(0x01, 0x00, RV_INS_TYPE_I1, execute_csr, "csrw\t$csr, $rs1"),
+RV32_SUB_FUNC_ENTRY(0x02, 0x00, RV_INS_TYPE_I1, execute_csr, "csrr\t$rd, $csr"),
+RV32_SUB_FUNC_ENTRY(0x03, 0x00, RV_INS_TYPE_I1, execute_csr, "csrc\t$csr, $rs1"),
 };
 
 rv32_opcode_sub_fn_t load_sub_list[] = {

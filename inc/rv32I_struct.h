@@ -131,7 +131,6 @@ typedef struct _rv_if_r
 typedef struct _rv_if_i1
 {
 
-    // CSR will fall under this category !!
     union _wordcode_i1
     {
         uint32_t wordcode;
