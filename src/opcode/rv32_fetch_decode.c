@@ -1,5 +1,5 @@
 #include "main.h"
-
+#include "rv32I_struct.h"
 #define MAX_OUTPUT_SIZE 256
 
 extern size_t opcode_list_len;
@@ -50,6 +50,7 @@ static csr_t csr_list[] = {
     { RV32_CSR_MCYCLE,       &(g_rv32i_csr.mcycle)},
     { RV32_CSR_MINSTRET,     &(g_rv32i_csr.minstret)}
 };
+
 
 static uint32_t get_i(uint32_t wc)
 {
@@ -222,7 +223,7 @@ void rv32_decode(uint32_t word, ram_t *ram)
         g_rv32i_ctx += RV32_PC_JUMP;
         return;
     }
-    g_rv32i_ctx->pc = exec_cb(&args);
+    g_rv32i_ctx->pc = exec_cb(&args); //
 }
 
 void rv32_fetch(ram_t *ram, uint32_t pc)
