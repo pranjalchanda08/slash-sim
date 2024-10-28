@@ -1,6 +1,7 @@
 #include "main.h"
 
 static ram_t *ram;
+rv32i_csr_t g_rv32i_csr;
 rv32i_ctx_t *g_rv32i_ctx;
 static rv_elf_section_info sections;
 
@@ -104,8 +105,8 @@ int main(int argc, char const *argv[])
     rv32_fetch(ram, entry_point);
     printf("-------------- Execution End ----------------\n\n");
 
-    rv32_ram_dump(argv[2]);
-    rv32_cpu_reg_dump(argv[2]);
+    rv32_ram_dump("csr");
+    rv32_cpu_reg_dump("csr");
     rv32_ram_detach();
     free(g_rv32i_ctx);
     return 0;

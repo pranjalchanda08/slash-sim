@@ -1,6 +1,7 @@
 #pragma once
 
 #include "inttypes.h"
+
 #include "platmem.h"
 #include "opcodes.h"
 
@@ -21,6 +22,37 @@ typedef enum ins_type
     RV_INS_TYPE_B
 } ins_type_t;
 
+typedef struct _rv32i_csr
+{
+    uint32_t mstatus;        // Machine Status Register
+    uint32_t misa;           // Machine ISA Register
+    uint32_t mie;            // Machine Interrupt Enable Register
+    uint32_t mtvec;          // Machine Trap-Vector Base Address
+    uint32_t mtvt;           // Machine Trap-Vector Table (if implemented)
+    uint32_t mstatush;       // Machine Status Register (high)
+    uint32_t mcountinhibit;  // Machine Counter Inhibit
+    uint32_t mhpmevent3;     // Machine Performance Monitor Event 3
+    uint32_t mhpmevent31;    // Machine Performance Monitor Event 31
+    uint32_t mscratch;       // Machine Scratch Register
+    uint32_t mepc;           // Machine Exception Program Counter
+    uint32_t mcause;         // Machine Cause Register
+    uint32_t mtval;          // Machine Trap Value Register
+    uint32_t mip;            // Machine Interrupt Pending Register
+    uint32_t mnxti;          // Machine Next Interrupt (if implemented)
+    uint32_t mintthresh;     // Machine Interrupt Threshold (if implemented)
+    uint32_t mscratchcswl;   // Machine Scratch Swap Lower (if implemented)
+    uint32_t tselect;        // Debug/Trace Trigger Select
+    uint32_t tdata1;         // Debug/Trace Data 1
+    uint32_t tdata2;         // Debug/Trace Data 2
+    uint32_t tinfo;          // Debug/Trace Info
+    uint32_t dcsr;           // Debug Control and Status Register
+    uint32_t dpc;            // Debug Program Counter
+    uint32_t dscratch0;      // Debug Scratch Register 0
+    uint32_t dscratch1;      // Debug Scratch Register 1
+    uint32_t mcycle;         // Machine Cycle Counter
+    uint32_t minstret;       // Machine Instructions Retired Counter
+
+} rv32i_csr_t;
 typedef struct _rv32i_ctx
 {
     union cpu_r
@@ -86,12 +118,12 @@ typedef struct _rv_if_r
         uint32_t wordcode;
         struct _rv_if_r_struct
         {
-            uint32_t opcode : 7; // 0-7 bit will contain opcode
-            uint32_t rd : 5;     // 7:11 will tell destination
-            uint32_t fn3 : 3;    // 12:14 will act as funtion field
-            uint32_t rs1 : 5;   // 15:19 source register
-            uint32_t rs2 : 5;   // 20:24 source register
-            uint32_t fn7 : 7;  // 25:31 other funtion field 
+            uint32_t opcode : 7;
+            uint32_t rd : 5;
+            uint32_t fn3 : 3;
+            uint32_t rs1 : 5;
+            uint32_t rs2 : 5;
+            uint32_t fn7 : 7;
         } _rv_if_r;
     } _wordcode_u;
 } rv_if_r_t;
@@ -103,7 +135,7 @@ typedef struct _rv_if_i1
     union _wordcode_i1
     {
         uint32_t wordcode;
-        struct _rv_if_i1_struct 
+        struct _rv_if_i1_struct
         {
             uint32_t opcode : 7;
             uint32_t rd : 5;
@@ -130,6 +162,10 @@ typedef struct _rv_if_i2_s_b
         } _rv_if_i2_s_b;
     } _wordcode_u;
 } rv_if_i2_s_b_t;
+typedef struct {
+    uint32_t address;
+    uint32_t *value;
+} csr_t;
 
 typedef struct exec_args
 {
@@ -142,6 +178,8 @@ typedef struct exec_args
     ins_type_t ins_type;
     rv32i_ctx_t *c_ctx;
     void * ram;
+    csr_t *csr_ctx;
+    uint32_t csr_index;
 } exec_args_t;
 
 typedef uint32_t (*exec)(exec_args_t *args);
