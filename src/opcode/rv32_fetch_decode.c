@@ -6,7 +6,7 @@
  * @brief   Functions related to Instruction fetch and decode
  *****************************************************************************************/
 #include "main.h"
-
+#include "rv32I_struct.h"
 #define MAX_OUTPUT_SIZE 256
 
 extern size_t opcode_list_len;
@@ -281,7 +281,7 @@ void rv32_decode(uint32_t word, ram_t *ram)
         g_rv32i_ctx += RV32_PC_JUMP;
         return;
     }
-    g_rv32i_ctx->pc = exec_cb(&args);
+    g_rv32i_ctx->pc = exec_cb(&args); //
 }
 
 void rv32_fetch(ram_t *ram, uint32_t pc)
