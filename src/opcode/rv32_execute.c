@@ -20,7 +20,7 @@ uint32_t execute_jal(exec_args_t *args)
 uint32_t execute_jalr(exec_args_t *args)
 {
     args->c_ctx->cpu_r_u.xn[args->rd] = args->c_ctx->pc + RV32_PC_JUMP;
-    return args->c_ctx->pc + args->imm + args->c_ctx->cpu_r_u.xn[args->rs1];
+    return (args->imm + args->c_ctx->cpu_r_u.xn[args->rs1]) & ~(1 << 0);
 }
 
 uint32_t execute_alur_r_add(exec_args_t *args)
@@ -218,37 +218,37 @@ uint32_t execute_branch(exec_args_t *args)
     case 0x00:
         /* beq (pc = pc + (rs1==rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 (args->c_ctx->cpu_r_u.xn[args->rs1] == args->c_ctx->cpu_r_u.xn[args->rs1]
+                 (args->c_ctx->cpu_r_u.xn[args->rs1] == args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     case 0x01:
         /* bne (pc = pc + (rs1!=rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 (args->c_ctx->cpu_r_u.xn[args->rs1] != args->c_ctx->cpu_r_u.xn[args->rs1]
+                 (args->c_ctx->cpu_r_u.xn[args->rs1] != args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     case 0x04:
         /* blt (pc = pc + (rs1<rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 ((int32_t)args->c_ctx->cpu_r_u.xn[args->rs1] < (int32_t)args->c_ctx->cpu_r_u.xn[args->rs1]
+                 ((int32_t)args->c_ctx->cpu_r_u.xn[args->rs1] < (int32_t)args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     case 0x05:
         /* bgt (pc = pc + (rs1>=rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 ((int32_t)args->c_ctx->cpu_r_u.xn[args->rs1] >= (int32_t)args->c_ctx->cpu_r_u.xn[args->rs1]
+                 ((int32_t)args->c_ctx->cpu_r_u.xn[args->rs1] >= (int32_t)args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     case 0x06:
         /* bltu (pc = pc + (rs1<rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 (args->c_ctx->cpu_r_u.xn[args->rs1] < args->c_ctx->cpu_r_u.xn[args->rs1]
+                 (args->c_ctx->cpu_r_u.xn[args->rs1] < args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     case 0x07:
         /* bgtu (pc = pc + (rs1>=rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 (args->c_ctx->cpu_r_u.xn[args->rs1] >= args->c_ctx->cpu_r_u.xn[args->rs1]
+                 (args->c_ctx->cpu_r_u.xn[args->rs1] >= args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     default:
