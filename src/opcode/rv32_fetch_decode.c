@@ -14,13 +14,22 @@ const char *reg_name_list[] =
      "s9", "s10", "s11", "t3", "t4", 
      "t5", "t6", "pc"};
 
+const char *csr_reg_list[] = {"mstatus", "misa", "mie",
+ "mtvec", "mtvt", "mstatush", "mcountinhibit", "mhpmevent3",
+  "mhpmevent31", "mscratch", "mepc", "mcause", "mtval", "mip",
+   "mnxti", "mintthresh", "mscratchcswl", "tselect", "tdata1", "tdata2",
+    "tinfo", "dcsr", "dpc", "dscratch0", "dscratch1", "mcycle", "minstret"};
+
+
+
+
 static uint32_t get_i(uint32_t wc)
 {
     wc = RV_MASK_I(wc);
     return wc & (1 << 12) ? wc | 0xFFFFF000 : wc & 0x00000FFF;
 }
 
-static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uint32_t r2, uint32_t imm)
+static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uint32_t r2, uint32_t imm , uint32_t csr_index)
 {
     char formatted[MAX_OUTPUT_SIZE];
     memset(formatted, 0, MAX_OUTPUT_SIZE); // Initialize the buffer
@@ -51,6 +60,12 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
                 out += sprintf(out, "0x%x", imm);
                 ptr += 2;
             }
+            else if (strncmp(ptr, "$csr", 4) == 0)
+            {
+            // int index = 
+            out += sprintf(out, "%s", csr_reg_list[csr_index]);
+                ptr += 4;
+            }
             else
             {
                 *out++ = *ptr++; // Copy character as-is
@@ -64,6 +79,7 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
     *out = '\0'; // Null-terminate the string
     printf("%s", formatted); // Print the final formatted string
 }
+
 
 static exec_args_t args;
 union type
@@ -127,9 +143,9 @@ void rv32_decode(uint32_t word, ram_t *ram)
     type_u.wordcode = word;
     const char *dec_str;
     exec exec_cb;
-    memset(&args, 0, sizeof(args));
+    memset(&args, 0, sizeof(args)); 
     for (size_t i = 0; i < opcode_list_len; i++)
-    {
+    {   
         if (type_u.u_j_word._wordcode_u._rv_if_u.opcode == opcode_reg_list[i].code)
         {
             exec_cb = opcode_reg_list[i].exec_cb;
@@ -166,11 +182,13 @@ void rv32_decode(uint32_t word, ram_t *ram)
                     }
                 }
             }
-
             break;
         }
     }
-    decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm);
+    uint32_t csr_instruction= (type_u.wordcode >> 20) & 0xFFF;
+    uint32_t csr_index = rv32_get_csr_index(csr_instruction);
+
+    decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm , csr_index);
     args.c_ctx = g_rv32i_ctx;
     args.ram = ram;
     if(!exec_cb)
@@ -199,3 +217,41 @@ void rv32_fetch(ram_t *ram, uint32_t pc)
         rv32_decode(wordcode, ram);
     }
 }
+
+
+int rv32_get_csr_index(uint32_t csr_address) {
+
+    switch (csr_address) {
+        case CSR_MSTATUS:       return 0; // mstatus
+        case CSR_MISA:         return 1; // misa
+        case CSR_MIE:          return 2; // mie
+        case CSR_MTVEC:        return 3; // mtvec
+        case CSR_MTVT:         return 4; // mtvt
+        case CSR_MSTATUSH:     return 5; // mstatush
+        case CSR_MCOUNTINHIBIT: return 6; // mcountinhibit
+        case CSR_MHPMEVENT3:   return 7; // mhpmevent3
+        case CSR_MHPMEVENT31:  return 8; // mhpmevent31
+        case CSR_MSCRATCH:     return 9; // mscratch
+        case CSR_MEPC:         return 10; // mepc
+        case CSR_MCAUSE:       return 11; // mcause
+        case CSR_MTVAL:        return 12; // mtval
+        case CSR_MIP:          return 13; // mip
+        case CSR_MNXTI:         return 14; // mnxti
+        case CSR_MINTTHRESH:   return 15; // mintthresh
+        case CSR_MSCRATCHCSWL: return 16; // mscratchcswl
+        case CSR_TSELECT:      return 17; // tselect
+        case CSR_TDATA1:       return 18; // tdata1
+        case CSR_TDATA2:       return 19; // tdata2
+        case CSR_TINFO:        return 20; // tinfo
+        case CSR_DCSR:         return 21; // dcsr
+        case CSR_DPC:          return 22; // dpc
+        case CSR_DSATCH0:     return 23; // dscratch0
+        case CSR_DSATCH1:     return 24; // dscratch1
+        case CSR_MCYCLE:       return 25; // mcycle
+        case CSR_MINSTRET:     return 26; // minstret
+
+     // .. i will add those later
+        default:               return -1; // Unknown CSR
+    }
+}
+

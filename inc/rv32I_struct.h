@@ -86,22 +86,24 @@ typedef struct _rv_if_r
         uint32_t wordcode;
         struct _rv_if_r_struct
         {
-            uint32_t opcode : 7;
-            uint32_t rd : 5;
-            uint32_t fn3 : 3;
-            uint32_t rs1 : 5;
-            uint32_t rs2 : 5;
-            uint32_t fn7 : 7;
+            uint32_t opcode : 7; 
+            uint32_t rd : 5;     
+            uint32_t fn3 : 3;    
+            uint32_t rs1 : 5;   
+            uint32_t rs2 : 5;   
+            uint32_t fn7 : 7;  
         } _rv_if_r;
     } _wordcode_u;
 } rv_if_r_t;
 
 typedef struct _rv_if_i1
 {
+
+
     union _wordcode_i1
     {
         uint32_t wordcode;
-        struct _rv_if_i1_struct
+        struct _rv_if_i1_struct 
         {
             uint32_t opcode : 7;
             uint32_t rd : 5;
