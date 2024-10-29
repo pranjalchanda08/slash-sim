@@ -136,10 +136,6 @@ typedef struct _rv_if_i2_s_b
         } _rv_if_i2_s_b;
     } _wordcode_u;
 } rv_if_i2_s_b_t;
-typedef struct {
-    uint32_t address;
-    uint32_t *value;
-} csr_t;
 
 typedef struct exec_args
 {

@@ -173,7 +173,6 @@ uint32_t execute_csr(exec_args_t *args) {
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
-
 uint32_t execute_load(exec_args_t *args)
 {
     switch (args->fn3)
