@@ -252,4 +252,3 @@ int rv32_get_csr_index(uint32_t csr_address) {
     }
     return -1;
 }
-
