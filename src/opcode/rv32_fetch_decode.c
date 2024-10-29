@@ -1,6 +1,5 @@
 #include "main.h"
-#include <rv32I_struct.h>
-#include <rv32_csr.h>
+
 #define MAX_OUTPUT_SIZE 256
 
 extern size_t opcode_list_len;
