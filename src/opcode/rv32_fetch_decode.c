@@ -1,5 +1,5 @@
 #include "main.h"
-#include "rv32I_struct.h"
+#include <rv32I_struct.h>
 #define MAX_OUTPUT_SIZE 256
 
 extern size_t opcode_list_len;
@@ -57,7 +57,7 @@ static uint32_t get_i(uint32_t wc)
     return wc & (1 << 12) ? wc | 0xFFFFF000 : wc & 0x00000FFF;
 }
 
-static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uint32_t r2, uint32_t imm , uint32_t csr_index)
+static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uint32_t r2, uint32_t imm, uint32_t csr_index)
 {
     char formatted[MAX_OUTPUT_SIZE];
     memset(formatted, 0, MAX_OUTPUT_SIZE); // Initialize the buffer
@@ -224,7 +224,7 @@ void rv32_decode(uint32_t word, ram_t *ram)
         g_rv32i_ctx += RV32_PC_JUMP;
         return;
     }
-    g_rv32i_ctx->pc = exec_cb(&args); //
+    g_rv32i_ctx->pc = exec_cb(&args);
 }
 
 void rv32_fetch(ram_t *ram, uint32_t pc)

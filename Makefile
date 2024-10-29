@@ -64,7 +64,7 @@ debug:
 ASMDIR ?= rv32_asm
 asm:
 	mkdir -p ./$(BUILD_DIR)
-	riscv64-unknown-elf-gcc -march=rv32i_zicsr -mabi=ilp32 -static -nostdlib -T$(ASMDIR)/$(LD_FILE) $(ASMDIR)/$(ASM).s -o $(BUILD_DIR)/${ASM}.elf
+	riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -static -nostdlib -T$(ASMDIR)/$(LD_FILE) $(ASMDIR)/$(ASM).s -o $(BUILD_DIR)/${ASM}.elf
 	riscv64-unknown-elf-objcopy -O binary $(BUILD_DIR)/$(ASM).elf $(BUILD_DIR)/$(ASM).bin
 
 -include $(DEPS)
