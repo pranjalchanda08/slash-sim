@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "main.h"
 
 uint32_t execute_lui(exec_args_t * args);
