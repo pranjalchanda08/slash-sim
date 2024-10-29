@@ -164,13 +164,8 @@ uint32_t execute_csr(exec_args_t *args) {
                     *(args->csr_ctx[args->csr_index].value) &= ~rs1_value;
                     break;
             }
-
-
-
-
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
-
 
 uint32_t execute_load(exec_args_t *args)
 {

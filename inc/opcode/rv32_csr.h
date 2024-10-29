@@ -1,4 +1,5 @@
 #pragma once
+
 // Machine CSRs
 #define CSR_MSTATUS          0x300  // Machine Status (lower 32 bits)
 #define CSR_MISA             0x301  // Machine ISA
@@ -74,3 +75,40 @@
 #define CSR_PMPADDR63        0x3EF  // Physical memory protection address register.
 #define CSR_MSECCFG          0x747  // Machine Security Configuration (lower 32 bits).
 #define CSR_MSECCFGH         0x757  // Machine Security Configuration (upper 32 bits).
+
+typedef struct _rv32i_csr
+{
+    uint32_t mstatus;        // Machine Status Register
+    uint32_t misa;           // Machine ISA Register
+    uint32_t mie;            // Machine Interrupt Enable Register
+    uint32_t mtvec;          // Machine Trap-Vector Base Address
+    uint32_t mtvt;           // Machine Trap-Vector Table (if implemented)
+    uint32_t mstatush;       // Machine Status Register (high)
+    uint32_t mcountinhibit;  // Machine Counter Inhibit
+    uint32_t mhpmevent3;     // Machine Performance Monitor Event 3
+    uint32_t mhpmevent31;    // Machine Performance Monitor Event 31
+    uint32_t mscratch;       // Machine Scratch Register
+    uint32_t mepc;           // Machine Exception Program Counter
+    uint32_t mcause;         // Machine Cause Register
+    uint32_t mtval;          // Machine Trap Value Register
+    uint32_t mip;            // Machine Interrupt Pending Register
+    uint32_t mnxti;          // Machine Next Interrupt (if implemented)
+    uint32_t mintthresh;     // Machine Interrupt Threshold (if implemented)
+    uint32_t mscratchcswl;   // Machine Scratch Swap Lower (if implemented)
+    uint32_t tselect;        // Debug/Trace Trigger Select
+    uint32_t tdata1;         // Debug/Trace Data 1
+    uint32_t tdata2;         // Debug/Trace Data 2
+    uint32_t tinfo;          // Debug/Trace Info
+    uint32_t dcsr;           // Debug Control and Status Register
+    uint32_t dpc;            // Debug Program Counter
+    uint32_t dscratch0;      // Debug Scratch Register 0
+    uint32_t dscratch1;      // Debug Scratch Register 1
+    uint32_t mcycle;         // Machine Cycle Counter
+    uint32_t minstret;       // Machine Instructions Retired Counter
+
+} rv32i_csr_t;
+
+typedef struct {
+    uint32_t address;
+    uint32_t *value;
+} csr_t;
