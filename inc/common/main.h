@@ -3,6 +3,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "inttypes.h"
+#include "rv32_err.h"
 #include "ram.h"
 #include "elf_reader.h"
 #include "rv32I_struct.h"
