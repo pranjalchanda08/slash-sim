@@ -1,5 +1,6 @@
 #include "main.h"
 #include <rv32I_struct.h>
+#include <rv32_csr.h>
 #define MAX_OUTPUT_SIZE 256
 
 extern size_t opcode_list_len;
@@ -22,33 +23,33 @@ const char *csr_reg_list[] = {
 };
 
 static csr_t csr_list[] = {
-    { 0x300, &(g_rv32i_csr.mstatus) },
-    { 0x301, &(g_rv32i_csr.misa) },
-    { 0x304, &(g_rv32i_csr.mie) },
-    { 0x305, &(g_rv32i_csr.mtvec) },
-    { 0x307, &(g_rv32i_csr.mtvt) },
-    { 0x310, &(g_rv32i_csr.mstatush) },
-    { 0x320, &(g_rv32i_csr.mcountinhibit) },
-    { 0xB00, &(g_rv32i_csr.mcycle) },
-    { 0x323, &(g_rv32i_csr.mhpmevent31) },
-    { 0x340, &(g_rv32i_csr.mscratch) },
-    { 0x341, &(g_rv32i_csr.mepc) },
-    { 0x342, &(g_rv32i_csr.mcause) },
-    { 0x343, &(g_rv32i_csr.mtval) },
-    { 0x344, &(g_rv32i_csr.mip) },
-    { 0x345, &(g_rv32i_csr.mnxti) },
-    { 0x346, &(g_rv32i_csr.mintthresh) },
-    { 0x348, &(g_rv32i_csr.mscratchcswl) },
-    { 0x7A0, &(g_rv32i_csr.tselect) },
-    { 0x7A1, &(g_rv32i_csr.tdata1) },
-    { 0x7A2, &(g_rv32i_csr.tdata2) },
-    { 0x7A4, &(g_rv32i_csr.tinfo) },
-    { 0x7B0, &(g_rv32i_csr.dcsr) },
-    { 0x7B1, &(g_rv32i_csr.dpc) },
-    { 0x7B2, &(g_rv32i_csr.dscratch0) },
-    { 0x7B3, &(g_rv32i_csr.dscratch1) },
-    { 0xB00, &(g_rv32i_csr.mcycle) },
-    { 0xB02, &(g_rv32i_csr.minstret) }
+    { CSR_MSTATUS,      &(g_rv32i_csr.mstatus)},
+    { CSR_MISA,         &(g_rv32i_csr.misa)},
+    { CSR_MIE,          &(g_rv32i_csr.mie)},
+    { CSR_MTVEC,        &(g_rv32i_csr.mtvec)},
+    { CSR_MTVT,         &(g_rv32i_csr.mtvt)},
+    { CSR_MSTATUSH,     &(g_rv32i_csr.mstatush)},
+    { CSR_MCOUNTINHIBIT,&(g_rv32i_csr.mcountinhibit)},
+    { CSR_MCYCLE,       &(g_rv32i_csr.mcycle)},
+    { CSR_MHPMEVENT3,   &(g_rv32i_csr.mhpmevent31)},
+    { CSR_MSCRATCH,     &(g_rv32i_csr.mscratch)},
+    { CSR_MEPC,         &(g_rv32i_csr.mepc)},
+    { CSR_MCAUSE,       &(g_rv32i_csr.mcause)},
+    { CSR_MTVAL,        &(g_rv32i_csr.mtval)},
+    { CSR_MIP,          &(g_rv32i_csr.mip)},
+    { CSR_MNXTI,        &(g_rv32i_csr.mnxti)},
+    { CSR_MINTTHRESH,   &(g_rv32i_csr.mintthresh)},
+    { CSR_MSCRATCHCSWL, &(g_rv32i_csr.mscratchcswl)},
+    { CSR_TSELECT,      &(g_rv32i_csr.tselect)},
+    { CSR_TDATA1,       &(g_rv32i_csr.tdata1)},
+    { CSR_TDATA2,       &(g_rv32i_csr.tdata2)},
+    { CSR_TINFO,        &(g_rv32i_csr.tinfo)},
+    { CSR_DCSR,         &(g_rv32i_csr.dcsr)},
+    { CSR_DPC,          &(g_rv32i_csr.dpc)},
+    { CSR_DSATCH0,      &(g_rv32i_csr.dscratch0)},
+    { CSR_DSATCH1,      &(g_rv32i_csr.dscratch1)},
+    { CSR_MCYCLE,       &(g_rv32i_csr.mcycle)},
+    { CSR_MINSTRET,     &(g_rv32i_csr.minstret)}
 };
 
 static uint32_t get_i(uint32_t wc)
@@ -90,7 +91,6 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
             }
             else if (strncmp(ptr, "$csr", 4) == 0)
             {
-
                 out += sprintf(out, "%s", csr_reg_list[csr_index]);
                 ptr += 4;
             }
@@ -213,11 +213,10 @@ void rv32_decode(uint32_t word, ram_t *ram)
     }
     uint32_t csr_instruction= (type_u.wordcode >> 20) & 0xFFF;
     args.csr_index = rv32_get_csr_index(csr_instruction);
-    decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm , args.csr_index);
     args.c_ctx = g_rv32i_ctx;
     args.ram = ram;
-
     args.csr_ctx =  csr_list;
+    decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm , args.csr_index);
     if(!exec_cb)
     {
         printf("\n[E]: No callback regiterd to perform execution\n");
