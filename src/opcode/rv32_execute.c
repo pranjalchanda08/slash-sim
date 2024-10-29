@@ -149,7 +149,6 @@ uint32_t execute_store_s_sw(exec_args_t *args)
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
-
 uint32_t execute_csr(exec_args_t *args) {
     uint32_t csr_address = args->imm;
     uint32_t rs1_value = args->c_ctx->cpu_r_u.xn[args->rs1];
