@@ -3,11 +3,11 @@
 .section .text
 .globl _start
 _start:
-    csrr a3, mcause
-    li t6 ,0x42
-    csrw mstatus, t6
-    csrr a3 , mstatus
-    csrr a1 ,misa
-    csrr a2, mtval
-    csrr t6, mcycle
-    csrw mcycle, t6
+li t0, 0x12345678
+csrw mscratch, t0
+csrr t1, mscratch
+csrw mepc, t0
+csrr t1, mepc
+csrw mtval, t0
+csrr t1, mtval
+
