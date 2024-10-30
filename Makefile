@@ -1,6 +1,10 @@
 CC = gcc
 CXX = g++
 
+GCC_VERSION := $(shell riscv64-unknown-elf-gcc --version | head -n 1 | awk '{print $$3}')
+GCC_MAJOR := $(word 1, $(subst ., ,$(GCC_VERSION)))
+GCC_MINOR := $(word 2, $(subst ., ,$(GCC_VERSION)))
+
 TARGET_EXEC := slash_sim
 
 BUILD_DIR := build
@@ -27,6 +31,12 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.
 CPPFLAGS := $(INC_FLAGS) -MMD -MP
+
+ifeq ($(shell test $(GCC_MAJOR) -ge 11 && echo 1), 1)
+    MARCH_FLAG := -march=rv32i_zicsr
+else
+    MARCH_FLAG := -march=rv32i
+endif
 
 ASM ?=
 ARGS ?=
@@ -63,7 +73,7 @@ debug:
 ASMDIR ?= rv32_asm
 asm:
 	mkdir -p ./$(BUILD_DIR)
-	riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -static -nostdlib -T$(ASMDIR)/$(LD_FILE) $(ASMDIR)/$(ASM).s -o $(BUILD_DIR)/${ASM}.elf
+	riscv64-unknown-elf-gcc $(MARCH_FLAG) -mabi=ilp32 -static -nostdlib -T$(ASMDIR)/$(LD_FILE) $(ASMDIR)/$(ASM).s -o $(BUILD_DIR)/${ASM}.elf
 	riscv64-unknown-elf-objcopy -O binary $(BUILD_DIR)/$(ASM).elf $(BUILD_DIR)/$(ASM).bin
 
 -include $(DEPS)
