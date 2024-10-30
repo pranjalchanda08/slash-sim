@@ -13,6 +13,7 @@
 #include "string.h"
 #include "stdlib.h"
 #include "stdio.h"
+#include "logging.h"
 /*****************************************************************************************
  * GLOBALS
  *****************************************************************************************/
@@ -68,7 +69,7 @@ uint32_t ram_load(ram_t *ram, uint32_t addr, uint32_t size)
 {
     if (addr >= ram->mem_size)
     {
-        printf("[E] : Memory access out of bound\n");
+        LOG_FATAL("Memory access out of bound");
     }
 
     switch (size)
@@ -92,7 +93,7 @@ void ram_store(ram_t *ram, uint32_t addr, uint32_t size, uint32_t value)
 {
     if (addr >= ram->mem_size)
     {
-        printf("[E] : Memory access out of bound\n");
+        LOG_FATAL("Memory access out of bound");
     }
 
     switch (size)

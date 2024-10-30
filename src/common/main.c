@@ -51,7 +51,7 @@ int main(int argc, char const *argv[])
     rv32_err_t err = RV32_SUCCESS;
     uint32_t entry_point;
 
-    printf("Slash-Sim Startup\n");
+    LOG_DEBUG("Slash-Sim Startup");
     err = check_args(argc, argv);
     RV32_ASSERT(err);
 
@@ -90,11 +90,11 @@ static rv32_err_t rv32_ram_attach()
     ram = init_ram(RAM_SIZE);
     if (ram)
     {
-        printf("RAM Init done\n");
+        LOG_DEBUG("RAM Init done");
     }
     else
     {
-        printf("[E: ] RAM Init Failed\n");
+        LOG_ERROR("RAM Init Failed");
         return RV32_ERR_RAM_INIT;
     }
     return RV32_SUCCESS;
@@ -107,7 +107,7 @@ static rv32_err_t rv32_ram_attach()
  ******************************************************************************************/
 static rv32_err_t rv32_ram_detach()
 {
-    printf("RAM De-Init done\n");
+    LOG_DEBUG("RAM De-Init done");
     deinit_ram();
     return RV32_SUCCESS;
 }
@@ -124,17 +124,17 @@ static rv32_err_t rv32_ram_store_elf(char const *file_path, uint32_t *imem_addr)
     FILE *elf = fopen(file_path, "rb");
     if (!elf)
     {
-        printf("[E] : File not found \n");
+        LOG_ERROR("File not found");
         return RV32_ERR_ELF_FILE;
     }
 
     if (EXIT_SUCCESS != read_elf(elf, (size_t *)imem_addr, ram))
     {
-        printf("[E] : Read ELF Error\n");
+        LOG_ERROR("Read ELF Error");
         return RV32_ERR_ELF_FILE;
     }
 
-    printf("Reading binary Success. PC: 0x%0x\n", *imem_addr);
+    LOG_DEBUG("Reading binary Success. PC: 0x%0x", *imem_addr);
     return RV32_SUCCESS;
 }
 
@@ -149,7 +149,7 @@ static void rv32_ram_dump(char const *asm_name)
     uint32_t imem_addr = 0;
     char *out_file_path = malloc(strlen(asm_name) + 20);
     sprintf(out_file_path, "out/%s/ram_dump.bin", asm_name);
-    printf("Saving RAM Dump: %s\n", out_file_path);
+    LOG_INFO("Saving RAM Dump: %s", out_file_path);
     FILE *mem = fopen(out_file_path, "wb");
     while (imem_addr < RAM_SIZE)
     {
@@ -171,7 +171,7 @@ static void rv32_cpu_reg_dump(char const *asm_name)
     char *out_file_path = malloc(strlen(asm_name) + 20);
     char *line = malloc(100);
     sprintf(out_file_path, "out/%s/reg_dump.txt", asm_name);
-    printf("Saving REG Dump: %s\n", out_file_path);
+    LOG_INFO("Saving REG Dump: %s", out_file_path);
     FILE *mem = fopen(out_file_path, "w");
     for (size_t i = 0; i < sizeof(rv32i_ctx_t) / sizeof(uint32_t); i++)
     {
@@ -194,12 +194,12 @@ static rv32_err_t check_args(int argc, char const *argv[])
 {
     if (argc < 2)
     {
-        printf("Instuction Binary not provided!!\n");
+        LOG_ERROR("ELF not provided!!");
         return RV32_ERR_ASSERT_PARAM;
     }
     if (argc < 3)
     {
-        printf("ASM name not provided\n");
+        LOG_ERROR("ASM name not provided");
         return RV32_ERR_ASSERT_PARAM;
     }
     return RV32_SUCCESS;

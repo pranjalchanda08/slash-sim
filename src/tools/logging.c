@@ -38,7 +38,7 @@ void log_message(LogLevel level, const char *format, ...) {
     if (level < current_log_level) return; // Skip messages below current log level
 
     // Print timestamp and log level (aligned)
-    printf("%s [%s] ", get_timestamp(), LOG_LEVEL_NAMES[level]);
+    printf("[%s] [%s]: ", get_timestamp(), LOG_LEVEL_NAMES[level]);
 
     // Handle variable arguments (like printf)
     va_list args;

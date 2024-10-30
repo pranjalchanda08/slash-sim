@@ -87,36 +87,35 @@ $ make run ARGS=build/add.elf ASM=add
 
 #### Output
 ```sh
-$ ./build/slash_sim build/add.elf add
-Slash-Sim Startup
-RAM Init done
-ELF found. Reading build/add.elf
+$ make run ARGS=build/add.elf ASM=add
+./build/slash_sim build/add.elf add
+[01:08:11.606] [DEBUG]: Slash-Sim Startup
+[01:08:11.606] [DEBUG]: RAM Init done
 ==================================================
   Section Name   |  Offset  |  Size   | Address
 ==================================================
 .text            | 0x001000 | 0x0001c | 0x00001000
 .data            | 0x002000 | 0x00011 | 0x00002000
 ==================================================
-Extracted binary data for section: .text
-Extracted binary data for section: .data
-Total Memory Layout Size: 0x1011 bytes
-Reading binary Success. PC: 0x1000
+[01:08:11.607] [DEBUG]: Extracted binary data for section: .text
+[01:08:11.607] [DEBUG]: Extracted binary data for section: .data
+[01:08:11.607] [DEBUG]: Total Memory Layout Size: 0x1011 bytes
+[01:08:11.607] [DEBUG]: Reading binary Success. PC: 0x1000
 
 -------------- Execution Start --------------
-
-[0x00002117]: [PC:0x00001000]: auipc    sp, 0x2000
-[0x00010113]: [PC:0x00001004]: addi     sp, sp, 0x0
-[0x01300293]: [PC:0x00001008]: addi     t0, x0, 0x13
-[0x02300313]: [PC:0x0000100C]: addi     t1, x0, 0x23
-[0x006283B3]: [PC:0x00001010]: add      t2, t0, t1
-[0x00001E97]: [PC:0x00001014]: auipc    t4, 0x1000
-[0xFECE8E93]: [PC:0x00001018]: addi     t4, t4, 0xffffffec
-[0x00000000]: [PC:0x0000101C]: PC reached EOF
+[01:08:11.607] [INFO ]: [0x00002117]: [PC:0x00001000]:  auipc    sp,  <0x2000, 8192d>
+[01:08:11.607] [INFO ]: [0x00010113]: [PC:0x00001004]:  addi     sp,  sp,  <0x00, 00d>
+[01:08:11.607] [INFO ]: [0x01300293]: [PC:0x00001008]:  addi     t0,  x0,  <0x13, 19d>
+[01:08:11.607] [INFO ]: [0x02300313]: [PC:0x0000100C]:  addi     t1,  x0,  <0x23, 35d>
+[01:08:11.607] [INFO ]: [0x006283B3]: [PC:0x00001010]:  add      t2,  t0,  t1
+[01:08:11.607] [INFO ]: [0x00001E97]: [PC:0x00001014]:  auipc    t4,  <0x1000, 4096d>
+[01:08:11.607] [INFO ]: [0xFECE8E93]: [PC:0x00001018]:  addi     t4,  t4,  <0xffffffec, -20d>
+[01:08:11.607] [DEBUG]: PC reached EOF
 -------------- Execution End ----------------
 
-Saving RAM Dump: out/add/ram_dump.bin
-Saving REG Dump: out/add/reg_dump.txt
-RAM De-Init done
+[01:08:11.608] [INFO ]: Saving RAM Dump: out/add/ram_dump.bin
+[01:08:11.608] [INFO ]: Saving REG Dump: out/add/reg_dump.txt
+[01:08:11.609] [DEBUG]: RAM De-Init done
 ```
 
 #### RAM Dump
