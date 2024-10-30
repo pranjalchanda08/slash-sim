@@ -1,15 +1,28 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    ram.c
+ * @brief   Functions related to RAM load and store
+ *****************************************************************************************/
+/*****************************************************************************************
+ * INCLUDES
+ *****************************************************************************************/
 #include "inttypes.h"
 #include "ram.h"
 #include "string.h"
 #include "stdlib.h"
 #include "stdio.h"
-
+/*****************************************************************************************
+ * GLOBALS
+ *****************************************************************************************/
 ram_t g_ram;
 
 static uint8_t dram_load_8(ram_t *ram, uint32_t addr)
 {
     return (uint32_t)ram->mem[addr];
 }
+
 static uint16_t dram_load_16(ram_t *ram, uint32_t addr)
 {
     return (uint32_t)ram->mem[addr] | (uint32_t)ram->mem[addr + 1] << 8;
@@ -57,7 +70,7 @@ uint32_t ram_load(ram_t *ram, uint32_t addr, uint32_t size)
     {
         printf("[E] : Memory access out of bound\n");
     }
-    
+
     switch (size)
     {
     case 8:
@@ -81,7 +94,7 @@ void ram_store(ram_t *ram, uint32_t addr, uint32_t size, uint32_t value)
     {
         printf("[E] : Memory access out of bound\n");
     }
-    
+
     switch (size)
     {
     case 8:

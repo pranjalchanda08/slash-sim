@@ -1,5 +1,11 @@
-#ifndef _ELF_READER_H_
-#define _ELF_READER_H_
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    elf_reader.h
+ * @brief   Functions declaration related to elf reader
+ *****************************************************************************************/
+#pragma once
 
 #include <elf.h>
 #include <stdio.h>
@@ -16,7 +22,4 @@ typedef struct {
     bool loadable;
 } rv_elf_section_info;
 
-
 int read_elf(FILE *file, size_t *entry_point, ram_t *ram);
-
-#endif /* _ELF_READER_H_ */

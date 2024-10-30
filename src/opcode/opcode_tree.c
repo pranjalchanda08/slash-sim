@@ -1,3 +1,10 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    opcode_tree.c
+ * @brief   File to register rv32 instructions
+ *****************************************************************************************/
 #include "rv32i_fetch_decode.h"
 
 rv32_opcode_sub_fn_t alui_sub_list[] = {
@@ -32,9 +39,9 @@ rv32_opcode_sub_fn_t store_sub_list[] = {
 };
 
 rv32_opcode_sub_fn_t csr_sub_list[] = {
-RV32_SUB_FUNC_ENTRY(0x01, 0x00, RV_INS_TYPE_I1, execute_csr, "csrw\t$csr, $rs1"),    
-RV32_SUB_FUNC_ENTRY(0x02, 0x00, RV_INS_TYPE_I1, execute_csr, "csrr\t$rd, $csr"),     
-RV32_SUB_FUNC_ENTRY(0x03, 0x00, RV_INS_TYPE_I1, execute_csr, "csrc\t$csr, $rs1"),    
+RV32_SUB_FUNC_ENTRY(0x01, 0x00, RV_INS_TYPE_I1, execute_csr, "csrw\t$csr, $rs1"),
+RV32_SUB_FUNC_ENTRY(0x02, 0x00, RV_INS_TYPE_I1, execute_csr, "csrr\t$rd, $csr"),
+RV32_SUB_FUNC_ENTRY(0x03, 0x00, RV_INS_TYPE_I1, execute_csr, "csrc\t$csr, $rs1"),
 };
 
 rv32_opcode_sub_fn_t load_sub_list[] = {

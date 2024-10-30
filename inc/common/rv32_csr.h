@@ -1,3 +1,10 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    rv32_csr.h
+ * @brief   Declarations related to CSR registers
+ *****************************************************************************************/
 #pragma once
 
 // Machine RV32_CSRs
