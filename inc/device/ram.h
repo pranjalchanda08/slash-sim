@@ -1,5 +1,4 @@
-#ifndef _RAM_H_
-#define _RAM_H_
+#pragma once
 
 #include "inttypes.h"
 #include "stdlib.h"
@@ -13,5 +12,3 @@ ram_t * init_ram(size_t ram_size);
 void deinit_ram();
 void ram_store(ram_t* ram, uint32_t addr, uint32_t size, uint32_t value);
 uint32_t ram_load(ram_t* ram, uint32_t addr, uint32_t size);
-
-#endif
