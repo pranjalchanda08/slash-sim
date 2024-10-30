@@ -1,21 +1,25 @@
-/**
- * Copyright (c) 2024 @slash-sim
- * 
- * @file elf_reader.c
- * @brief   Used to Read ELF files to load it to RAM
- * @version 0.1
- * @date 2024-10-28
- * @author Pranjal Chanda (pranjalchanda08@gmail.com)
- */
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    elf_reader.c
+ * @brief   Provides definations related to ELF file readings
+ *****************************************************************************************/
 
+/*****************************************************************************************
+ * INCLUDES
+ *****************************************************************************************/
 #include "elf_reader.h"
 
-/**
+/*****************************************************************************************
+ * FUNCTION DEFINATIONS
+ *****************************************************************************************/
+/******************************************************************************************
  * @brief Prints the section details in tabulated format
- * 
+ *
  * @param[in] sections      Array of predecoded sections
  * @param[in] num_sections  No of sections in the array
- */
+ *****************************************************************************************/
 static void print_section_details(rv_elf_section_info *sections, int num_sections)
 {
     printf("==================================================\n");
@@ -35,15 +39,15 @@ static void print_section_details(rv_elf_section_info *sections, int num_section
     printf("==================================================\n");
 }
 
-/**
+/******************************************************************************************
  * @brief Function to extract binary data of all loadable sections
- * 
- * @param[in] file          File Descripter of the ELF file 
- * @param[in] sections      Array of predecoded sections      
+ *
+ * @param[in] file          File Descripter of the ELF file
+ * @param[in] sections      Array of predecoded sections
  * @param[in] num_sections  No of sections in the array
- * @param[in] ram           Pre allocated RAM structure to load the sections 
- * @return int 
- */
+ * @param[in] ram           Pre allocated RAM structure to load the sections
+ * @return int
+ *****************************************************************************************/
 static int extract_binary_data(FILE *file, rv_elf_section_info *sections, int num_sections, ram_t *ram)
 {
     for (int i = 0; i < num_sections; i++)
@@ -69,15 +73,15 @@ static int extract_binary_data(FILE *file, rv_elf_section_info *sections, int nu
     return 0; // Success
 }
 
-/**
+/******************************************************************************************
  * @brief Function to read ELF32 sections
- * 
- * @param[in] file                  File Descripter of the ELF file 
+ *
+ * @param[in] file                  File Descripter of the ELF file
  * @param[in] elf_header            Pre Read ELF Header
  * @param[out] sections             Space holder for sections array allocation
- * @param[out] total_memory_size    Total memory size (Loadable) 
+ * @param[out] total_memory_size    Total memory size (Loadable)
  * @return int  No of section entry in the ELF table header
- */
+ *****************************************************************************************/
 static int read_elf32_sections(FILE *file, Elf32_Ehdr *elf_header, rv_elf_section_info **sections, size_t *total_memory_size)
 {
     fseek(file, elf_header->e_shoff, SEEK_SET);
@@ -137,15 +141,15 @@ static int read_elf32_sections(FILE *file, Elf32_Ehdr *elf_header, rv_elf_sectio
     return elf_header->e_shnum;
 }
 
-/**
+/******************************************************************************************
  * @brief Function to read ELF64 sections
- * 
- * @param[in] file                  File Descripter of the ELF file 
+ *
+ * @param[in] file                  File Descripter of the ELF file
  * @param[in] elf_header            Pre Read ELF Header
  * @param[out] sections             Space holder for sections array allocation
- * @param[out] total_memory_size    Total memory size (Loadable) 
+ * @param[out] total_memory_size    Total memory size (Loadable)
  * @return int  No of section entry in the ELF table header
- */
+ *****************************************************************************************/
 static int read_elf64_sections(FILE *file, Elf64_Ehdr *elf_header, rv_elf_section_info **sections, size_t *total_memory_size)
 {
     fseek(file, elf_header->e_shoff, SEEK_SET);
@@ -205,14 +209,14 @@ static int read_elf64_sections(FILE *file, Elf64_Ehdr *elf_header, rv_elf_sectio
     return elf_header->e_shnum;
 }
 
-/**
+/******************************************************************************************
  * @brief Read ELF and save the data into RAM corresponding address
- * 
- * @param[in] file          File Descripter of the ELF file  
+ *
+ * @param[in] file          File Descripter of the ELF file
  * @param[out] entry_point  PC entry address
  * @param[in] ram           Pre allocated RAM structure to load the sections
- * @return int 
- */
+ * @return int
+ *****************************************************************************************/
 int read_elf(FILE *file, size_t *entry_point, ram_t *ram)
 {
     unsigned char e_ident[EI_NIDENT];

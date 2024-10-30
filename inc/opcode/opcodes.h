@@ -1,3 +1,10 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    opcodes.h
+ * @brief   Opcode declaration
+ *****************************************************************************************/
 #pragma once
 
 typedef enum opcode

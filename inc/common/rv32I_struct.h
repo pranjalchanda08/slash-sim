@@ -1,7 +1,7 @@
 #pragma once
 
 #include "inttypes.h"
-#include "platmem.h"
+#include "plat_const.h"
 #include "opcodes.h"
 #include "rv32_csr.h"
 
@@ -140,7 +140,7 @@ typedef struct exec_args
     uint32_t fn7;
     ins_type_t ins_type;
     rv32i_ctx_t *c_ctx;
-    void * ram;
+    ram_t * ram;
     csr_t *csr_ctx;
     uint32_t csr_index;
 } exec_args_t;

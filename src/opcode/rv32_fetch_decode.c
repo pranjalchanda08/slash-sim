@@ -1,3 +1,10 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    rv32_fetch_decode.c
+ * @brief   Functions related to Instruction fetch and decode
+ *****************************************************************************************/
 #include "main.h"
 
 #define MAX_OUTPUT_SIZE 256
@@ -5,51 +12,111 @@
 extern size_t opcode_list_len;
 extern rv32_opcode_reg_t opcode_reg_list[];
 
-const char *reg_name_list[] =
-    {"x0", "ra", "sp", "gp", "tp",
-     "t0", "t1", "t2", "s0", "s1",
-     "a0", "a1", "a2", "a3", "a4",
-     "a5", "a6", "a7", "s2", "s3",
-     "s4", "s5", "s6", "s7", "s8",
-     "s9", "s10", "s11", "t3", "t4",
-     "t5", "t6", "pc"};
+const char *reg_name_list[] = {
+    "x0",
+    "ra",
+    "sp",
+    "gp",
+    "tp",
+    "t0",
+    "t1",
+    "t2",
+    "s0",
+    "s1",
+    "a0",
+    "a1",
+    "a2",
+    "a3",
+    "a4",
+    "a5",
+    "a6",
+    "a7",
+    "s2",
+    "s3",
+    "s4",
+    "s5",
+    "s6",
+    "s7",
+    "s8",
+    "s9",
+    "s10",
+    "s11",
+    "t3",
+    "t4",
+    "t5",
+    "t6",
+    "pc",
+};
 
-const char *csr_reg_list[] = {
-    "mstatus", "misa", "mie", "mtvec", "mtvt", "mstatush", "mcountinhibit",
-    "mcycle", "mhpmevent31", "mscratch", "mepc", "mcause", "mtval", "mip",
-    "mnxti", "mintthresh", "mscratchcswl", "tselect", "tdata1", "tdata2",
-    "tinfo", "dcsr", "dpc", "dscratch0", "dscratch1", "mcycle", "minstret"
+static const char *csr_reg_list[] = {
+    "mstatus",
+    "misa",
+    "mie",
+    "mtvec",
+    "mtvt",
+    "mstatush",
+    "mcountinhibit",
+    "mcycle",
+    "mhpmevent31",
+    "mscratch",
+    "mepc",
+    "mcause",
+    "mtval",
+    "mip",
+    "mnxti",
+    "mintthresh",
+    "mscratchcswl",
+    "tselect",
+    "tdata1",
+    "tdata2",
+    "tinfo",
+    "dcsr",
+    "dpc",
+    "dscratch0",
+    "dscratch1",
+    "mcycle",
+    "minstret",
 };
 
 static csr_t csr_list[] = {
-    { RV32_CSR_MSTATUS,      &(g_rv32i_csr.mstatus)},
-    { RV32_CSR_MISA,         &(g_rv32i_csr.misa)},
-    { RV32_CSR_MIE,          &(g_rv32i_csr.mie)},
-    { RV32_CSR_MTVEC,        &(g_rv32i_csr.mtvec)},
-    { RV32_CSR_MTVT,         &(g_rv32i_csr.mtvt)},
-    { RV32_CSR_MSTATUSH,     &(g_rv32i_csr.mstatush)},
-    { RV32_CSR_MCOUNTINHIBIT,&(g_rv32i_csr.mcountinhibit)},
-    { RV32_CSR_MCYCLE,       &(g_rv32i_csr.mcycle)},
-    { RV32_CSR_MHPMEVENT3,   &(g_rv32i_csr.mhpmevent31)},
-    { RV32_CSR_MSCRATCH,     &(g_rv32i_csr.mscratch)},
-    { RV32_CSR_MEPC,         &(g_rv32i_csr.mepc)},
-    { RV32_CSR_MCAUSE,       &(g_rv32i_csr.mcause)},
-    { RV32_CSR_MTVAL,        &(g_rv32i_csr.mtval)},
-    { RV32_CSR_MIP,          &(g_rv32i_csr.mip)},
-    { RV32_CSR_MNXTI,        &(g_rv32i_csr.mnxti)},
-    { RV32_CSR_MINTTHRESH,   &(g_rv32i_csr.mintthresh)},
-    { RV32_CSR_MSCRATCHCSWL, &(g_rv32i_csr.mscratchcswl)},
-    { RV32_CSR_TSELECT,      &(g_rv32i_csr.tselect)},
-    { RV32_CSR_TDATA1,       &(g_rv32i_csr.tdata1)},
-    { RV32_CSR_TDATA2,       &(g_rv32i_csr.tdata2)},
-    { RV32_CSR_TINFO,        &(g_rv32i_csr.tinfo)},
-    { RV32_CSR_DCSR,         &(g_rv32i_csr.dcsr)},
-    { RV32_CSR_DPC,          &(g_rv32i_csr.dpc)},
-    { RV32_CSR_DSATCH0,      &(g_rv32i_csr.dscratch0)},
-    { RV32_CSR_DSATCH1,      &(g_rv32i_csr.dscratch1)},
-    { RV32_CSR_MCYCLE,       &(g_rv32i_csr.mcycle)},
-    { RV32_CSR_MINSTRET,     &(g_rv32i_csr.minstret)}
+    {RV32_CSR_MSTATUS, &(g_rv32i_csr.mstatus)},
+    {RV32_CSR_MISA, &(g_rv32i_csr.misa)},
+    {RV32_CSR_MIE, &(g_rv32i_csr.mie)},
+    {RV32_CSR_MTVEC, &(g_rv32i_csr.mtvec)},
+    {RV32_CSR_MTVT, &(g_rv32i_csr.mtvt)},
+    {RV32_CSR_MSTATUSH, &(g_rv32i_csr.mstatush)},
+    {RV32_CSR_MCOUNTINHIBIT, &(g_rv32i_csr.mcountinhibit)},
+    {RV32_CSR_MCYCLE, &(g_rv32i_csr.mcycle)},
+    {RV32_CSR_MHPMEVENT3, &(g_rv32i_csr.mhpmevent31)},
+    {RV32_CSR_MSCRATCH, &(g_rv32i_csr.mscratch)},
+    {RV32_CSR_MEPC, &(g_rv32i_csr.mepc)},
+    {RV32_CSR_MCAUSE, &(g_rv32i_csr.mcause)},
+    {RV32_CSR_MTVAL, &(g_rv32i_csr.mtval)},
+    {RV32_CSR_MIP, &(g_rv32i_csr.mip)},
+    {RV32_CSR_MNXTI, &(g_rv32i_csr.mnxti)},
+    {RV32_CSR_MINTTHRESH, &(g_rv32i_csr.mintthresh)},
+    {RV32_CSR_MSCRATCHCSWL, &(g_rv32i_csr.mscratchcswl)},
+    {RV32_CSR_TSELECT, &(g_rv32i_csr.tselect)},
+    {RV32_CSR_TDATA1, &(g_rv32i_csr.tdata1)},
+    {RV32_CSR_TDATA2, &(g_rv32i_csr.tdata2)},
+    {RV32_CSR_TINFO, &(g_rv32i_csr.tinfo)},
+    {RV32_CSR_DCSR, &(g_rv32i_csr.dcsr)},
+    {RV32_CSR_DPC, &(g_rv32i_csr.dpc)},
+    {RV32_CSR_DSATCH0, &(g_rv32i_csr.dscratch0)},
+    {RV32_CSR_DSATCH1, &(g_rv32i_csr.dscratch1)},
+    {RV32_CSR_MCYCLE, &(g_rv32i_csr.mcycle)},
+    {RV32_CSR_MINSTRET, &(g_rv32i_csr.minstret)},
 };
+
+static exec_args_t args;
+static union type
+{
+    uint32_t wordcode;
+    rv_if_u_j_t u_j_word;
+    rv_if_r_t r_word;
+    rv_if_i1_t i1_word;
+    rv_if_i2_s_b_t i2_s_b_word;
+} type_u;
 
 static uint32_t get_i(uint32_t wc)
 {
@@ -103,18 +170,10 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
             *out++ = *ptr++; // Copy character as-is
         }
     }
-    *out = '\0'; // Null-terminate the string
+    *out = '\0';             // Null-terminate the string
     printf("%s", formatted); // Print the final formatted string
 }
-static exec_args_t args;
-union type
-{
-    uint32_t wordcode;
-    rv_if_u_j_t u_j_word;
-    rv_if_r_t r_word;
-    rv_if_i1_t i1_word;
-    rv_if_i2_s_b_t i2_s_b_word;
-} type_u;
+
 void decode_type(ins_type_t ins_type)
 {
     switch (ins_type)
@@ -210,13 +269,13 @@ void rv32_decode(uint32_t word, ram_t *ram)
             break;
         }
     }
-    uint32_t csr_instruction= (type_u.wordcode >> 20) & 0xFFF;
+    uint32_t csr_instruction = (type_u.wordcode >> 20) & 0xFFF;
     args.csr_index = rv32_get_csr_index(csr_instruction);
     args.c_ctx = g_rv32i_ctx;
     args.ram = ram;
-    args.csr_ctx =  csr_list;
-    decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm , args.csr_index);
-    if(!exec_cb)
+    args.csr_ctx = csr_list;
+    decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm, args.csr_index);
+    if (!exec_cb)
     {
         printf("\n[E]: No callback regiterd to perform execution\n");
         g_rv32i_ctx += RV32_PC_JUMP;
@@ -243,10 +302,13 @@ void rv32_fetch(ram_t *ram, uint32_t pc)
     }
 }
 
-int rv32_get_csr_index(uint32_t csr_address) {
+int rv32_get_csr_index(uint32_t csr_address)
+{
     size_t num_csrs = sizeof(csr_list) / sizeof(csr_list[0]);
-    for (size_t i = 0; i < num_csrs; i++) {
-        if (csr_list[i].address == csr_address) {
+    for (size_t i = 0; i < num_csrs; i++)
+    {
+        if (csr_list[i].address == csr_address)
+        {
             return i;
         }
     }

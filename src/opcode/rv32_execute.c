@@ -1,3 +1,10 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    rv32_execute.c
+ * @brief   File to contain the callback function of decoded instructions
+ *****************************************************************************************/
 #include "rv32i_execute.h"
 
 uint32_t execute_lui(exec_args_t *args)

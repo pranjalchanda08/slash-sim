@@ -1,3 +1,10 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    rv32_err.h
+ * @brief   Defination related to rv32_err
+ *****************************************************************************************/
 #pragma once
 
 typedef enum

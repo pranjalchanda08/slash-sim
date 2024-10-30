@@ -1,10 +1,10 @@
 #ifndef _PLATMEM_H_
 #define _PLATMEM_H_
 
-#define _K(_x)   (_x*1024)
+#define K   *1024
 
 #ifndef RAM_SIZE
-#define RAM_SIZE  _K(16)
+#define RAM_SIZE  16 K
 #endif
 
 #define RV32_PC_JUMP    sizeof(uint32_t)

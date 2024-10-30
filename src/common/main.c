@@ -1,10 +1,32 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    main.c
+ * @brief   Entry point and core logic of the Slash Sim RV32 simulator.
+ *          This file initializes the context, handles memory, and loads ELF binaries.
+ *****************************************************************************************/
+
+/*****************************************************************************************
+ * INCLUDES
+ *****************************************************************************************/
 #include "main.h"
 
-static ram_t *ram;
+/*****************************************************************************************
+ * GLOBALS
+ *****************************************************************************************/
 rv32i_csr_t g_rv32i_csr;
 rv32i_ctx_t *g_rv32i_ctx;
+
+/*****************************************************************************************
+ * STATICS
+ *****************************************************************************************/
+static ram_t *ram;
 static rv_elf_section_info sections;
 
+/*****************************************************************************************
+ * FUNCTION DECLARATION
+ *****************************************************************************************/
 static rv32_err_t rv32_ram_attach();
 static rv32_err_t rv32_ram_detach();
 static rv32_err_t rv32_ram_store_elf(char const *file_path, uint32_t *imem_addr);
@@ -12,6 +34,18 @@ static void rv32_ram_dump(char const *asm_name);
 static void rv32_cpu_reg_dump(char const *asm_name);
 static rv32_err_t check_args(int argc, char const *argv[]);
 
+/*****************************************************************************************
+ * FUNCTION DEFINATION
+ *****************************************************************************************/
+
+/*******************************************************************************************
+ * @brief  Entry point of the simulator. Initializes the context and loads the ELF binary.
+ *
+ * @param[in] argc  Argument count.
+ * @param[in] argv  Argument values.
+ *
+ * @return Exit status of the program.
+ ******************************************************************************************/
 int main(int argc, char const *argv[])
 {
     rv32_err_t err = RV32_SUCCESS;
@@ -46,7 +80,11 @@ exit:
     free(g_rv32i_ctx);
     return RV32_SUCCESS;
 }
-
+/*******************************************************************************************
+ * @brief Initialise RAM with provided static RAM_SIZE macro
+ *
+ * @return rv32_err_t
+ ******************************************************************************************/
 static rv32_err_t rv32_ram_attach()
 {
     ram = init_ram(RAM_SIZE);
@@ -62,6 +100,11 @@ static rv32_err_t rv32_ram_attach()
     return RV32_SUCCESS;
 }
 
+/*******************************************************************************************
+ * @brief Detach RAM peripheral
+ *
+ * @return rv32_err_t
+ ******************************************************************************************/
 static rv32_err_t rv32_ram_detach()
 {
     printf("RAM De-Init done\n");
@@ -69,6 +112,13 @@ static rv32_err_t rv32_ram_detach()
     return RV32_SUCCESS;
 }
 
+/*******************************************************************************************
+ * @brief   Read an ELF file, extract binary from it and store it in different sections
+ *
+ * @param[in] file_path     Path to the ELF file
+ * @param[out] imem_addr    VMA of the entry point
+ * @return rv32_err_t
+ ******************************************************************************************/
 static rv32_err_t rv32_ram_store_elf(char const *file_path, uint32_t *imem_addr)
 {
     FILE *elf = fopen(file_path, "rb");
@@ -88,6 +138,11 @@ static rv32_err_t rv32_ram_store_elf(char const *file_path, uint32_t *imem_addr)
     return RV32_SUCCESS;
 }
 
+/*******************************************************************************************
+ * @brief Store the current RAM dump of the running program
+ *
+ * @param[in] asm_name  Name of the program being simulated
+ ******************************************************************************************/
 static void rv32_ram_dump(char const *asm_name)
 {
     uint32_t buff;
@@ -106,6 +161,11 @@ static void rv32_ram_dump(char const *asm_name)
     fclose(mem);
 }
 
+/*******************************************************************************************
+ * @brief Save the reg dump of the current CPU state
+ *
+ * @param[in] asm_name  Name of the program running on sim
+ ******************************************************************************************/
 static void rv32_cpu_reg_dump(char const *asm_name)
 {
     char *out_file_path = malloc(strlen(asm_name) + 20);
@@ -123,6 +183,13 @@ static void rv32_cpu_reg_dump(char const *asm_name)
     fclose(mem);
 }
 
+/*******************************************************************************************
+ * @brief Check the command line args provided to the sim
+ *
+ * @param argc  No of args
+ * @param argv  Pointer to args
+ * @return rv32_err_t
+ ******************************************************************************************/
 static rv32_err_t check_args(int argc, char const *argv[])
 {
     if (argc < 2)
