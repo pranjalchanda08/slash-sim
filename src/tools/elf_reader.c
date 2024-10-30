@@ -10,6 +10,7 @@
  * INCLUDES
  *****************************************************************************************/
 #include "elf_reader.h"
+#include "logging.h"
 
 /*****************************************************************************************
  * FUNCTION DEFINATIONS
@@ -57,7 +58,7 @@ static int extract_binary_data(FILE *file, rv_elf_section_info *sections, int nu
             uint32_t *data = (uint32_t *)malloc(sections[i].size);
             if (!data)
             {
-                perror("Failed to allocate memory for section data");
+                LOG_DEBUG("Failed to allocate memory for section data");
                 return -1;
             }
             fseek(file, sections[i].offset, SEEK_SET);
@@ -67,7 +68,7 @@ static int extract_binary_data(FILE *file, rv_elf_section_info *sections, int nu
                 ram_store(ram, (sections[i].addr + (j * sizeof(uint32_t))), 32, data[j]);
             }
             free(data);
-            printf("Extracted binary data for section: %s\n", sections[i].name);
+            LOG_DEBUG("Extracted binary data for section: %s", sections[i].name);
         }
     }
     return 0; // Success
@@ -88,7 +89,7 @@ static int read_elf32_sections(FILE *file, Elf32_Ehdr *elf_header, rv_elf_sectio
     Elf32_Shdr *section_headers = malloc(elf_header->e_shnum * sizeof(Elf32_Shdr));
     if (!section_headers)
     {
-        perror("Failed to allocate memory for section headers");
+        LOG_DEBUG("Failed to allocate memory for section headers");
         return -1;
     }
     fread(section_headers, elf_header->e_shnum, sizeof(Elf32_Shdr), file);
@@ -98,7 +99,7 @@ static int read_elf32_sections(FILE *file, Elf32_Ehdr *elf_header, rv_elf_sectio
     char *shstrtab = malloc(shstrtab_header.sh_size);
     if (!shstrtab)
     {
-        perror("Failed to allocate memory for section names");
+        LOG_DEBUG("Failed to allocate memory for section names");
         free(section_headers);
         return -1;
     }
@@ -108,7 +109,7 @@ static int read_elf32_sections(FILE *file, Elf32_Ehdr *elf_header, rv_elf_sectio
     *sections = malloc(elf_header->e_shnum * sizeof(rv_elf_section_info));
     if (!*sections)
     {
-        perror("Failed to allocate memory for rv_elf_section_info");
+        LOG_DEBUG("Failed to allocate memory for rv_elf_section_info");
         free(section_headers);
         free(shstrtab);
         return -1;
@@ -156,7 +157,7 @@ static int read_elf64_sections(FILE *file, Elf64_Ehdr *elf_header, rv_elf_sectio
     Elf64_Shdr *section_headers = malloc(elf_header->e_shnum * sizeof(Elf64_Shdr));
     if (!section_headers)
     {
-        perror("Failed to allocate memory for section headers");
+        LOG_DEBUG("Failed to allocate memory for section headers");
         return -1;
     }
     fread(section_headers, elf_header->e_shnum, sizeof(Elf64_Shdr), file);
@@ -166,7 +167,7 @@ static int read_elf64_sections(FILE *file, Elf64_Ehdr *elf_header, rv_elf_sectio
     char *shstrtab = malloc(shstrtab_header.sh_size);
     if (!shstrtab)
     {
-        perror("Failed to allocate memory for section names");
+        LOG_DEBUG("Failed to allocate memory for section names");
         free(section_headers);
         return -1;
     }
@@ -176,7 +177,7 @@ static int read_elf64_sections(FILE *file, Elf64_Ehdr *elf_header, rv_elf_sectio
     *sections = malloc(elf_header->e_shnum * sizeof(rv_elf_section_info));
     if (!*sections)
     {
-        perror("Failed to allocate memory for rv_elf_section_info");
+        LOG_DEBUG("Failed to allocate memory for rv_elf_section_info");
         free(section_headers);
         free(shstrtab);
         return -1;
@@ -264,7 +265,7 @@ int read_elf(FILE *file, size_t *entry_point, ram_t *ram)
         return EXIT_FAILURE;
     }
 
-    printf("Total Memory Layout Size: 0x%lx bytes\n", total_memory_size);
+    LOG_DEBUG("Total Memory Layout Size: 0x%lx bytes", total_memory_size);
 
     for (int i = 0; i < num_sections; i++)
     {

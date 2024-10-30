@@ -124,9 +124,8 @@ static uint32_t get_i(uint32_t wc)
     return wc & (1 << 12) ? wc | 0xFFFFF000 : wc & 0x00000FFF;
 }
 
-static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uint32_t r2, uint32_t imm, uint32_t csr_index)
+static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uint32_t r2, uint32_t imm, uint32_t csr_index, char *formatted)
 {
-    char formatted[MAX_OUTPUT_SIZE];
     memset(formatted, 0, MAX_OUTPUT_SIZE); // Initialize the buffer
     const char *ptr = template;
     char *out = formatted;
@@ -137,22 +136,22 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
         { // Found a placeholder
             if (strncmp(ptr, "$rd", 3) == 0)
             {
-                out += sprintf(out, "%s", reg_name_list[rd]);
+                out += sprintf(out, "%3s", reg_name_list[rd]);
                 ptr += 3;
             }
             else if (strncmp(ptr, "$rs1", 4) == 0)
             {
-                out += sprintf(out, "%s", reg_name_list[r1]);
+                out += sprintf(out, "%3s", reg_name_list[r1]);
                 ptr += 4;
             }
             else if (strncmp(ptr, "$rs2", 4) == 0)
             {
-                out += sprintf(out, "%s", reg_name_list[r2]);
+                out += sprintf(out, "%3s", reg_name_list[r2]);
                 ptr += 4;
             }
             else if (strncmp(ptr, "$i", 2) == 0)
             {
-                out += sprintf(out, "0x%x", imm);
+                out += sprintf(out, " <0x%02x, %02dd>", imm, imm);
                 ptr += 2;
             }
             else if (strncmp(ptr, "$csr", 4) == 0)
@@ -170,8 +169,7 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
             *out++ = *ptr++; // Copy character as-is
         }
     }
-    *out = '\0';             // Null-terminate the string
-    printf("%s", formatted); // Print the final formatted string
+    *out = '\0'; // Null-terminate the string
 }
 
 void decode_type(ins_type_t ins_type)
@@ -228,6 +226,7 @@ void rv32_decode(uint32_t word, ram_t *ram)
     const char *dec_str;
     exec exec_cb;
     memset(&args, 0, sizeof(args));
+    char formatted[MAX_OUTPUT_SIZE];
     for (size_t i = 0; i < opcode_list_len; i++)
     {
         if (type_u.u_j_word._wordcode_u._rv_if_u.opcode == opcode_reg_list[i].code)
@@ -274,10 +273,11 @@ void rv32_decode(uint32_t word, ram_t *ram)
     args.c_ctx = g_rv32i_ctx;
     args.ram = ram;
     args.csr_ctx = csr_list;
-    decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm, args.csr_index);
+    decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm, args.csr_index, formatted);
+    LOG_INFO("[0x%08X]: [PC:0x%08X]:\t%s", type_u.wordcode, g_rv32i_ctx->pc, formatted);
     if (!exec_cb)
     {
-        printf("\n[E]: No callback regiterd to perform execution\n");
+        LOG_FATAL("No callback regiterd to perform execution");
         g_rv32i_ctx += RV32_PC_JUMP;
         return;
     }
@@ -292,10 +292,9 @@ void rv32_fetch(ram_t *ram, uint32_t pc)
     while (1)
     {
         wordcode = ram_load(ram, g_rv32i_ctx->pc, 32);
-        printf("\n[0x%08X]: [PC:0x%08X]: ", wordcode, g_rv32i_ctx->pc);
         if (!wordcode)
         {
-            printf("PC reached EOF\n");
+            LOG_DEBUG("PC reached EOF");
             break;
         }
         rv32_decode(wordcode, ram);

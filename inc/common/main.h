@@ -9,6 +9,7 @@
 
 #include "stdio.h"
 #include "string.h"
+#include "logging.h"
 #include "inttypes.h"
 #include "rv32_err.h"
 #include "ram.h"
