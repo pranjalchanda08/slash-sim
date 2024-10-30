@@ -3,7 +3,6 @@
 .section .text
 .globl _start
 _start:
-
 li t0, 0x12345678
 csrw mscratch, t0
 csrr t1, mscratch
