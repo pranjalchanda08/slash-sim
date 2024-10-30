@@ -1,3 +1,10 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    rv32i_struct.h
+ * @brief   Structure defination of RV32 Instructions
+ *****************************************************************************************/
 #pragma once
 
 #include "inttypes.h"

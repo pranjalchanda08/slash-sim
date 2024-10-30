@@ -1,5 +1,11 @@
-#ifndef _PLATMEM_H_
-#define _PLATMEM_H_
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    plat_const.h
+ * @brief   Provides platform constants
+ *****************************************************************************************/
+#pragma once
 
 #define K   *1024
 
@@ -9,5 +15,3 @@
 
 #define RV32_PC_JUMP    sizeof(uint32_t)
 #define RV32_XLEN_BIT   32
-
-#endif /* _PLATMEM_H_ */
