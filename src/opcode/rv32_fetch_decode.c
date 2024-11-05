@@ -13,38 +13,38 @@ extern size_t opcode_list_len;
 extern rv32_opcode_reg_t opcode_reg_list[];
 
 const char *reg_name_list[] = {
-    "x0",
-    "ra",
-    "sp",
-    "gp",
-    "tp",
-    "t0",
-    "t1",
-    "t2",
-    "s0",
-    "s1",
-    "a0",
-    "a1",
-    "a2",
-    "a3",
-    "a4",
-    "a5",
-    "a6",
-    "a7",
-    "s2",
-    "s3",
-    "s4",
-    "s5",
-    "s6",
-    "s7",
-    "s8",
-    "s9",
-    "s10",
-    "s11",
-    "t3",
-    "t4",
-    "t5",
-    "t6",
+    "x0 <zero>",
+    "x1 <ra>",
+    "x2 <sp>",
+    "x3 <gp>",
+    "x4 <tp>",
+    "x5 <t0>",
+    "x6 <t1>",
+    "x7 <t2>",
+    "x8 <s0>",
+    "x9 <s1>",
+    "x10 <a0>",
+    "x11 <a1>",
+    "x12 <a2>",
+    "x13 <a3>",
+    "x14 <a4>",
+    "x15 <a5>",
+    "x16 <a6>",
+    "x17 <a7>",
+    "x18 <s2>",
+    "x19 <s3>",
+    "x20 <s4>",
+    "x21 <s5>",
+    "x22 <s6>",
+    "x23 <s7>",
+    "x24 <s8>",
+    "x25 <s9>",
+    "x26 <s10>",
+    "x27 <s11>",
+    "x28 <t3>",
+    "x29 <t4>",
+    "x31 <t5>",
+    "x31 <t6>",
     "pc",
 };
 
@@ -136,22 +136,22 @@ static void decode_and_print(const char *template, uint32_t rd, uint32_t r1, uin
         { // Found a placeholder
             if (strncmp(ptr, "$rd", 3) == 0)
             {
-                out += sprintf(out, "%3s", reg_name_list[rd]);
+                out += sprintf(out, "%-10s", reg_name_list[rd]);
                 ptr += 3;
             }
             else if (strncmp(ptr, "$rs1", 4) == 0)
             {
-                out += sprintf(out, "%3s", reg_name_list[r1]);
+                out += sprintf(out, "%-10s", reg_name_list[r1]);
                 ptr += 4;
             }
             else if (strncmp(ptr, "$rs2", 4) == 0)
             {
-                out += sprintf(out, "%3s", reg_name_list[r2]);
+                out += sprintf(out, "%-10s", reg_name_list[r2]);
                 ptr += 4;
             }
             else if (strncmp(ptr, "$i", 2) == 0)
             {
-                out += sprintf(out, " <0x%02x, %02dd>", imm, imm);
+                out += sprintf(out, "0x%02x <%02dd>", imm, imm);
                 ptr += 2;
             }
             else if (strncmp(ptr, "$csr", 4) == 0)

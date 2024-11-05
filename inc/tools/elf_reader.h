@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "ram.h"
+#include <ram.h>
 
 typedef struct {
     char *name;

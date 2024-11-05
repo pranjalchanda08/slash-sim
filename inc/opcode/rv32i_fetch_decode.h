@@ -6,7 +6,8 @@
  * @brief   Functions declaration related to Instruction fetch and decode
  *****************************************************************************************/
 #pragma once
-#include "main.h"
+
+#include <main.h>
 
 void rv32_fetch(ram_t *ram, uint32_t pc);
 void rv32_decode(uint32_t word, ram_t *ram);
