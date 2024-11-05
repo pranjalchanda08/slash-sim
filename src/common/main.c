@@ -64,18 +64,19 @@ int main(int argc, char const *argv[])
     memset(g_rv32i_ctx, 0, sizeof(rv32i_ctx_t));
 
     err = rv32_ram_attach();
-    RV32_ASSERT_GOTO(err, exit);
+    RV32_ASSERT_GOTO(err, ramdump_exit);
     /* Read instruction and data binary and save it to the ram instance */
     err = rv32_ram_store_elf(argv[1], &entry_point);
-    RV32_ASSERT_GOTO(err, exit);
+    RV32_ASSERT_GOTO(err, elf_exit);
 
     printf("\n-------------- Execution Start --------------\n");
     rv32_fetch(ram, entry_point);
     printf("-------------- Execution End ----------------\n\n");
 
-exit:
+elf_exit:
     rv32_ram_dump(argv[2]);
     rv32_cpu_reg_dump(argv[2]);
+ramdump_exit:
     rv32_ram_detach();
     free(g_rv32i_ctx);
     return RV32_SUCCESS;
@@ -175,7 +176,7 @@ static void rv32_cpu_reg_dump(char const *asm_name)
     FILE *mem = fopen(out_file_path, "w");
     for (size_t i = 0; i < sizeof(rv32i_ctx_t) / sizeof(uint32_t); i++)
     {
-        sprintf(line, "%4s: 0x%08x\n", reg_name_list[i], *((uint32_t *)g_rv32i_ctx + i));
+        sprintf(line, "%s: 0x%08x\n", reg_name_list[i], *((uint32_t *)g_rv32i_ctx + i));
         fputs(line, mem);
     }
     free(line);

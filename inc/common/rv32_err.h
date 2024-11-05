@@ -9,11 +9,11 @@
 
 typedef enum
 {
-    RV32_SUCCESS,
-    RV32_ERR_ASSERT_PARAM,
-    RV32_ERR_RAM_INIT,
-    RV32_ERR_ELF_FILE,
-    RV32_ERR_MALLOC,
+    RV32_SUCCESS                = 0,
+    RV32_ERR_ASSERT_PARAM       = 1,
+    RV32_ERR_RAM_INIT           = 2,
+    RV32_ERR_ELF_FILE           = 3,
+    RV32_ERR_MALLOC             = 4,
 }rv32_err_t;
 
 #define RV32_ASSERT(_x) if(_x != RV32_SUCCESS) return _x

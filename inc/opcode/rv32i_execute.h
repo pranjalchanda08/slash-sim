@@ -7,7 +7,7 @@
  *****************************************************************************************/
 #pragma once
 
-#include "main.h"
+#include <main.h>
 
 uint32_t execute_lui(exec_args_t * args);
 uint32_t execute_jal(exec_args_t * args);

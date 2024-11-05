@@ -89,33 +89,33 @@ $ make run ARGS=build/add.elf ASM=add
 ```sh
 $ make run ARGS=build/add.elf ASM=add
 ./build/slash_sim build/add.elf add
-[01:08:11.606] [DEBUG]: Slash-Sim Startup
-[01:08:11.606] [DEBUG]: RAM Init done
+[22:40:15.633] [DEBUG]: Slash-Sim Startup
+[22:40:15.634] [DEBUG]: RAM Init done
 ==================================================
   Section Name   |  Offset  |  Size   | Address
 ==================================================
 .text            | 0x001000 | 0x0001c | 0x00001000
 .data            | 0x002000 | 0x00011 | 0x00002000
 ==================================================
-[01:08:11.607] [DEBUG]: Extracted binary data for section: .text
-[01:08:11.607] [DEBUG]: Extracted binary data for section: .data
-[01:08:11.607] [DEBUG]: Total Memory Layout Size: 0x1011 bytes
-[01:08:11.607] [DEBUG]: Reading binary Success. PC: 0x1000
+[22:40:15.634] [DEBUG]: Extracted binary data for section: .text
+[22:40:15.634] [DEBUG]: Extracted binary data for section: .data
+[22:40:15.634] [DEBUG]: Total Memory Layout Size: 0x1011 bytes
+[22:40:15.634] [DEBUG]: Reading binary Success. PC: 0x1000
 
 -------------- Execution Start --------------
-[01:08:11.607] [INFO ]: [0x00002117]: [PC:0x00001000]:  auipc    sp,  <0x2000, 8192d>
-[01:08:11.607] [INFO ]: [0x00010113]: [PC:0x00001004]:  addi     sp,  sp,  <0x00, 00d>
-[01:08:11.607] [INFO ]: [0x01300293]: [PC:0x00001008]:  addi     t0,  x0,  <0x13, 19d>
-[01:08:11.607] [INFO ]: [0x02300313]: [PC:0x0000100C]:  addi     t1,  x0,  <0x23, 35d>
-[01:08:11.607] [INFO ]: [0x006283B3]: [PC:0x00001010]:  add      t2,  t0,  t1
-[01:08:11.607] [INFO ]: [0x00001E97]: [PC:0x00001014]:  auipc    t4,  <0x1000, 4096d>
-[01:08:11.607] [INFO ]: [0xFECE8E93]: [PC:0x00001018]:  addi     t4,  t4,  <0xffffffec, -20d>
-[01:08:11.607] [DEBUG]: PC reached EOF
+[22:40:15.634] [INFO ]: [0x00002117]: [PC:0x00001000]:  auipc   x2 <sp>   , 0x2000 <8192d>
+[22:40:15.635] [INFO ]: [0x00010113]: [PC:0x00001004]:  addi    x2 <sp>   , x2 <sp>   , 0x00 <00d>
+[22:40:15.635] [INFO ]: [0x01300293]: [PC:0x00001008]:  addi    x5 <t0>   , x0 <zero> , 0x13 <19d>
+[22:40:15.635] [INFO ]: [0x02300313]: [PC:0x0000100C]:  addi    x6 <t1>   , x0 <zero> , 0x23 <35d>
+[22:40:15.635] [INFO ]: [0x006283B3]: [PC:0x00001010]:  add     x7 <t2>   , x5 <t0>   , x6 <t1>
+[22:40:15.635] [INFO ]: [0x00001E97]: [PC:0x00001014]:  auipc   x29 <t4>  , 0x1000 <4096d>
+[22:40:15.635] [INFO ]: [0xFECE8E93]: [PC:0x00001018]:  addi    x29 <t4>  , x29 <t4>  , 0xffffffec <-20d>
+[22:40:15.635] [DEBUG]: PC reached EOF
 -------------- Execution End ----------------
 
-[01:08:11.608] [INFO ]: Saving RAM Dump: out/add/ram_dump.bin
-[01:08:11.608] [INFO ]: Saving REG Dump: out/add/reg_dump.txt
-[01:08:11.609] [DEBUG]: RAM De-Init done
+[22:40:15.635] [INFO ]: Saving RAM Dump: out/add/ram_dump.bin
+[22:40:15.636] [INFO ]: Saving REG Dump: out/add/reg_dump.txt
+[22:40:15.637] [DEBUG]: RAM De-Init done
 ```
 
 #### RAM Dump
@@ -136,12 +136,11 @@ $ hexdump out/add/ram_dump.bin
 #### CPU REG Dump
 ```sh
 $ grep -v "0x00000000" out/add/reg_dump.txt
-  sp: 0x00003000
-  t0: 0x00000013
-  t1: 0x00000023
-  t2: 0x00000036
-  t4: 0x00002000
-  pc: 0x0000101c
-
+x2 <sp>: 0x00003000
+x5 <t0>: 0x00000013
+x6 <t1>: 0x00000023
+x7 <t2>: 0x00000036
+x29 <t4>: 0x00002000
+pc: 0x0000101c
 ```
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "inttypes.h"
-#include "stdlib.h"
+#include <inttypes.h>
+#include <stdlib.h>
 
 typedef struct ram
 {
