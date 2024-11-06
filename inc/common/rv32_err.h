@@ -18,3 +18,4 @@ typedef enum
 
 #define RV32_ASSERT(_x) if(_x != RV32_SUCCESS) return _x
 #define RV32_ASSERT_GOTO(_x, _sec) if(_x != RV32_SUCCESS) goto _sec
+#define RV32_ASSERT_PARAM(_cond)   if(!(_cond)) return RV32_ERR_ASSERT_PARAM
