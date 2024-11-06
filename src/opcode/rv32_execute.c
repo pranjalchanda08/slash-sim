@@ -140,19 +140,19 @@ uint32_t execute_alui_i2_srli(exec_args_t *args)
 
 uint32_t execute_store_s_sb(exec_args_t *args)
 {
-    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 8, args->rs2 & 0x000000FF);
+    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 8, args->c_ctx->cpu_r_u.xn[args->rs2] & 0x000000FF);
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
 uint32_t execute_store_s_sh(exec_args_t *args)
 {
-    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 16, args->rs2 & 0x0000FFFF);
+    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 16, args->c_ctx->cpu_r_u.xn[args->rs2] & 0x0000FFFF);
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
 uint32_t execute_store_s_sw(exec_args_t *args)
 {
-    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 32, args->rs2 & 0xFFFFFFFF);
+    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 32, args->c_ctx->cpu_r_u.xn[args->rs2] & 0xFFFFFFFF);
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
