@@ -48,7 +48,7 @@ const char *reg_name_list[] = {
     "pc",
 };
 
-static const char *csr_reg_list[] = {
+const char *csr_reg_list[] = {
     "mstatus",
     "misa",
     "mie",
