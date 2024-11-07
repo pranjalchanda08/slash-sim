@@ -184,11 +184,6 @@ static void rv32_cpu_reg_dump(char const *asm_name)
         sprintf(line, "%s: 0x%08x\n", csr_reg_list[i], *((uint32_t* )&g_rv32i_csr + i));
         fputs(line, mem);
     }
-    for (size_t i = 0; i < sizeof(rv32i_csr_t) / sizeof(uint32_t); i++)
-    {
-        sprintf(line, "%s: 0x%08x\n", csr_reg_list[i], *((uint32_t* )&g_rv32i_csr + i));
-        fputs(line, mem);
-    }
     free(line);
     free(out_file_path);
     fclose(mem);

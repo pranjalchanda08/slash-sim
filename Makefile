@@ -1,6 +1,7 @@
 CC = gcc
 CXX = g++
-
+#Checks the compiler version and associate corresponding flag
+# eg : for [version > 11] _zicsr flag is required
 GCC_VERSION := $(shell riscv64-unknown-elf-gcc --version | head -n 1 | awk '{print $$3}')
 GCC_MAJOR := $(word 1, $(subst ., ,$(GCC_VERSION)))
 GCC_MINOR := $(word 2, $(subst ., ,$(GCC_VERSION)))
