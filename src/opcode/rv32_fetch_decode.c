@@ -285,6 +285,7 @@ void rv32_decode(uint32_t word)
     if (err)
     {
         /* TODO: Raise Exception */
+        LOG_ERROR("EXEC Error: 0x%x, %d", g_rv32i_ctx->pc, err);
     }
 }
 
@@ -296,10 +297,12 @@ void rv32_fetch(uint32_t pc)
     uint32_t wordcode;
     while (1)
     {
-        err = peripheral_exec_load(g_rv32i_ctx->pc, sizeof(uint32_t), (uint8_t*)&wordcode); // ram_load(ram, g_rv32i_ctx->pc, 32);
+        err = peripheral_exec_load(g_rv32i_ctx->pc, sizeof(uint32_t), (size_t*)&wordcode);
         if (err)
         {
             /* TODO: Raise Exception */
+            LOG_ERROR("LOAD Error: 0x%x", g_rv32i_ctx->pc);
+            return;
         }
         else if (!wordcode)
         {

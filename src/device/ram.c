@@ -15,24 +15,29 @@
 ram_t g_ram;
 slash_peripheral_t ram_fd;
 
-static rv32_err_t ram_peripheral_load(size_t addr, size_t len, uint8_t *bytes);
-static rv32_err_t ram_peripheral_store(size_t addr, size_t len, uint8_t *bytes);
+static rv32_err_t ram_peripheral_load(size_t addr, size_t len, size_t *bytes);
+static rv32_err_t ram_peripheral_store(size_t addr, size_t len, size_t bytes);
+static rv32_err_t ram_peripheral_init(void* args);
+static rv32_err_t ram_peripheral_deinit(void);
 
-static slash_peripheral_api_t ram_api = {
+slash_peripheral_api_t ram_peripheral_api = {
+    .init = ram_peripheral_init,
     .load = ram_peripheral_load,
     .store = ram_peripheral_store,
+    .deinit = ram_peripheral_deinit,
 };
 
-rv32_err_t init_ram(size_t ram_size)
+static rv32_err_t ram_peripheral_init(void* args)
 {
-    g_ram.mem = (uint8_t *)malloc(ram_size);
-    g_ram.mem_size = ram_size;
-    return peripheral_register("ram", 0x00, 0x10000, &ram_api, &ram_fd);
+    g_ram.mem = (uint8_t *)calloc((size_t)args, 1);
+    g_ram.mem_size = (size_t)args;
+    return RV32_SUCCESS;
 }
 
-void deinit_ram()
+static rv32_err_t ram_peripheral_deinit(void)
 {
     free(g_ram.mem);
+    return RV32_SUCCESS;
 }
 
 static uint8_t dram_load_8(ram_t *ram, uint32_t addr)
@@ -116,14 +121,14 @@ static void ram_store(ram_t *ram, uint32_t addr, uint32_t size, uint32_t value)
     }
 }
 
-static rv32_err_t ram_peripheral_load(size_t addr, size_t len, uint8_t *bytes)
+static rv32_err_t ram_peripheral_load(size_t addr, size_t len, size_t *bytes)
 {
     *bytes = ram_load(&g_ram, addr, (len * 8));
     return RV32_SUCCESS;
 }
 
-static rv32_err_t ram_peripheral_store(size_t addr, size_t len, uint8_t *bytes)
+static rv32_err_t ram_peripheral_store(size_t addr, size_t len, size_t bytes)
 {
-    ram_store(&g_ram, addr, (len * 8), *bytes);
+    ram_store(&g_ram, addr, (len * 8), bytes);
     return RV32_SUCCESS;
 }

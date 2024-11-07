@@ -12,6 +12,7 @@
 #include "elf_reader.h"
 #include "logging.h"
 
+uint32_t value;
 /*****************************************************************************************
  * FUNCTION DEFINATIONS
  *****************************************************************************************/
@@ -65,7 +66,8 @@ static int extract_binary_data(FILE *file, rv_elf_section_info *sections, int nu
             fread(data, 1, sections[i].size, file);
             for (size_t j = 0; j < (sections[i].size / sizeof(uint32_t)); j++)
             {
-                err = peripheral_exec_store((sections[i].addr + (j * sizeof(uint32_t))), sizeof(uint32_t), (uint8_t *)(data + j));
+                value = data[j];
+                err = peripheral_exec_store((sections[i].addr + (j * sizeof(uint32_t))), sizeof(uint32_t), value);
                 RV32_ASSERT(err);
             }
             free(data);

@@ -15,6 +15,7 @@ typedef enum
     RV32_ERR_ELF_FILE           = 3,
     RV32_ERR_MALLOC             = 4,
     RV32_ERR_PERI_BUS_ERROR     = 5,
+    RV32_ERR_PERI_NOT_FOUND     = 6,
 }rv32_err_t;
 
 #define RV32_ASSERT(_x) if(_x != RV32_SUCCESS) return _x

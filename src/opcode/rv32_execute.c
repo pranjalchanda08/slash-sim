@@ -164,7 +164,7 @@ rv32_err_t execute_store_s_sb(exec_args_t *args, size_t *next_pc)
 {
     rv32_err_t err;
     uint8_t value = args->rs2 & 0x000000FF;
-    err = peripheral_exec_store(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint8_t), &value);
+    err = peripheral_exec_store(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint8_t), value);
     RV32_ASSERT_ERR(err == RV32_SUCCESS, err);
     *next_pc = args->c_ctx->pc + RV32_PC_JUMP;
     return RV32_SUCCESS;
@@ -174,7 +174,7 @@ rv32_err_t execute_store_s_sh(exec_args_t *args, size_t *next_pc)
 {
     rv32_err_t err;
     uint16_t value = args->rs2 & 0x0000FFFF;
-    err = peripheral_exec_store(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint16_t), (uint8_t *)&value);
+    err = peripheral_exec_store(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint16_t), value);
     RV32_ASSERT_ERR(err == RV32_SUCCESS, err);
     *next_pc = args->c_ctx->pc + RV32_PC_JUMP;
     return RV32_SUCCESS;
@@ -184,7 +184,7 @@ rv32_err_t execute_store_s_sw(exec_args_t *args, size_t *next_pc)
 {
     rv32_err_t err;
     uint32_t value = args->rs2 & 0xFFFFFFFF;
-    err = peripheral_exec_store(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint16_t), (uint8_t *)&value);
+    err = peripheral_exec_store(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint16_t), value);
     RV32_ASSERT_ERR(err == RV32_SUCCESS, err);
     *next_pc = args->c_ctx->pc + RV32_PC_JUMP;
     return RV32_SUCCESS;
@@ -217,31 +217,31 @@ rv32_err_t execute_load(exec_args_t *args, size_t *next_pc)
     {
     case 0x00:
         /* lb (rd = mmio8(rs1+imm_1)) */
-        peripheral_exec_load(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint8_t), (uint8_t *)&load_val);
+        peripheral_exec_load(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint8_t), (size_t *)&load_val);
         args->c_ctx->cpu_r_u.xn[args->rd] = 0xFFFFFF00;
         args->c_ctx->cpu_r_u.xn[args->rd] |= load_val;
         break;
     case 0x04:
         /* lbu (rd = mmio8(rs1+imm_1)) */
-        peripheral_exec_load(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint8_t), (uint8_t *)&load_val);
+        peripheral_exec_load(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint8_t), (size_t *)&load_val);
         args->c_ctx->cpu_r_u.xn[args->rd] = 0x00000000;
         args->c_ctx->cpu_r_u.xn[args->rd] |= load_val;
         break;
     case 0x01:
         /* lh (rd = mmio16(rs1+imm_1)) */
-        peripheral_exec_load(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint16_t), (uint8_t *)&load_val);
+        peripheral_exec_load(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint16_t), (size_t *)&load_val);
         args->c_ctx->cpu_r_u.xn[args->rd] = 0xFFFFFF00;
         args->c_ctx->cpu_r_u.xn[args->rd] |= load_val;
         break;
     case 0x05:
         /* lhu (rd = mmio16(rs1+imm_1)) */
-        peripheral_exec_load(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint16_t), (uint8_t *)&load_val);
+        peripheral_exec_load(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint16_t), (size_t *)&load_val);
         args->c_ctx->cpu_r_u.xn[args->rd] = 0x00000000;
         args->c_ctx->cpu_r_u.xn[args->rd] |= load_val;
         break;
     case 0x02:
         /* lw (rd = mmio16(rs1+imm_1)) */
-        peripheral_exec_load(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint32_t), (uint8_t *)&load_val);
+        peripheral_exec_load(args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, sizeof(uint32_t), (size_t *)&load_val);
         args->c_ctx->cpu_r_u.xn[args->rd] = 0xFFFFFF00;
         args->c_ctx->cpu_r_u.xn[args->rd] |= load_val;
         break;
