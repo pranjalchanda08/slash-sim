@@ -228,7 +228,7 @@ void rv32_decode(uint32_t word, ram_t *ram)
     memset(&args, 0, sizeof(args));
     char formatted[MAX_OUTPUT_SIZE];
     for (size_t i = 0; i < opcode_list_len; i++)
-    {
+    {   
         if (type_u.u_j_word._wordcode_u._rv_if_u.opcode == opcode_reg_list[i].code)
         {
             exec_cb = opcode_reg_list[i].exec_cb;
