@@ -46,11 +46,11 @@ static void print_section_details(rv_elf_section_info *sections, int num_section
  * @param[in] file          File Descripter of the ELF file
  * @param[in] sections      Array of predecoded sections
  * @param[in] num_sections  No of sections in the array
- * @param[in] ram           Pre allocated RAM structure to load the sections
  * @return int
  *****************************************************************************************/
-static int extract_binary_data(FILE *file, rv_elf_section_info *sections, int num_sections, ram_t *ram)
+static int extract_binary_data(FILE *file, rv_elf_section_info *sections, int num_sections)
 {
+    rv32_err_t err;
     for (int i = 0; i < num_sections; i++)
     {
         if (sections[i].loadable)
@@ -65,7 +65,8 @@ static int extract_binary_data(FILE *file, rv_elf_section_info *sections, int nu
             fread(data, 1, sections[i].size, file);
             for (size_t j = 0; j < (sections[i].size / sizeof(uint32_t)); j++)
             {
-                ram_store(ram, (sections[i].addr + (j * sizeof(uint32_t))), 32, data[j]);
+                err = peripheral_exec_store((sections[i].addr + (j * sizeof(uint32_t))), sizeof(uint32_t), (uint8_t *)(data + j));
+                RV32_ASSERT(err);
             }
             free(data);
             LOG_DEBUG("Extracted binary data for section: %s", sections[i].name);
@@ -215,10 +216,9 @@ static int read_elf64_sections(FILE *file, Elf64_Ehdr *elf_header, rv_elf_sectio
  *
  * @param[in] file          File Descripter of the ELF file
  * @param[out] entry_point  PC entry address
- * @param[in] ram           Pre allocated RAM structure to load the sections
  * @return int
  *****************************************************************************************/
-int read_elf(FILE *file, size_t *entry_point, ram_t *ram)
+int read_elf(FILE *file, size_t *entry_point)
 {
     unsigned char e_ident[EI_NIDENT];
     fread(e_ident, 1, EI_NIDENT, file);
@@ -258,7 +258,7 @@ int read_elf(FILE *file, size_t *entry_point, ram_t *ram)
 
     print_section_details(sections, num_sections);
 
-    if (extract_binary_data(file, sections, num_sections, ram) < 0)
+    if (extract_binary_data(file, sections, num_sections) < 0)
     {
         fprintf(stderr, "Failed to extract binary data\n");
         fclose(file);

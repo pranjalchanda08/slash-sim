@@ -21,7 +21,6 @@ rv32i_ctx_t *g_rv32i_ctx;
 /*****************************************************************************************
  * STATICS
  *****************************************************************************************/
-static ram_t *ram;
 static rv_elf_section_info sections;
 
 /*****************************************************************************************
@@ -30,7 +29,7 @@ static rv_elf_section_info sections;
 static rv32_err_t rv32_ram_attach();
 static rv32_err_t rv32_ram_detach();
 static rv32_err_t rv32_ram_store_elf(char const *file_path, uint32_t *imem_addr);
-static void rv32_ram_dump(char const *asm_name);
+static void rv32_ram_dump(char const *asm_name, size_t ram_base_addr);
 static void rv32_cpu_reg_dump(char const *asm_name);
 static rv32_err_t check_args(int argc, char const *argv[]);
 
@@ -70,11 +69,11 @@ int main(int argc, char const *argv[])
     RV32_ASSERT_GOTO(err, elf_exit);
 
     printf("\n-------------- Execution Start --------------\n");
-    rv32_fetch(ram, entry_point);
+    rv32_fetch(entry_point);
     printf("-------------- Execution End ----------------\n\n");
 
 elf_exit:
-    rv32_ram_dump(argv[2]);
+    rv32_ram_dump(argv[2], 0x00);
     rv32_cpu_reg_dump(argv[2]);
 ramdump_exit:
     rv32_ram_detach();
@@ -88,12 +87,9 @@ ramdump_exit:
  ******************************************************************************************/
 static rv32_err_t rv32_ram_attach()
 {
-    ram = init_ram(RAM_SIZE);
-    if (ram)
-    {
-        LOG_DEBUG("RAM Init done");
-    }
-    else
+    rv32_err_t err;
+    err = init_ram(RAM_SIZE);
+    if(err != RV32_SUCCESS)
     {
         LOG_ERROR("RAM Init Failed");
         return RV32_ERR_RAM_INIT;
@@ -129,7 +125,7 @@ static rv32_err_t rv32_ram_store_elf(char const *file_path, uint32_t *imem_addr)
         return RV32_ERR_ELF_FILE;
     }
 
-    if (EXIT_SUCCESS != read_elf(elf, (size_t *)imem_addr, ram))
+    if (EXIT_SUCCESS != read_elf(elf, (size_t *)imem_addr))
     {
         LOG_ERROR("Read ELF Error");
         return RV32_ERR_ELF_FILE;
@@ -142,9 +138,10 @@ static rv32_err_t rv32_ram_store_elf(char const *file_path, uint32_t *imem_addr)
 /*******************************************************************************************
  * @brief Store the current RAM dump of the running program
  *
- * @param[in] asm_name  Name of the program being simulated
+ * @param[in] asm_name      Name of the program being simulated
+ * @param[in] ram_base_addr RAM Base address
  ******************************************************************************************/
-static void rv32_ram_dump(char const *asm_name)
+static void rv32_ram_dump(char const *asm_name, size_t ram_base_addr)
 {
     uint32_t buff;
     uint32_t imem_addr = 0;
@@ -154,7 +151,8 @@ static void rv32_ram_dump(char const *asm_name)
     FILE *mem = fopen(out_file_path, "wb");
     while (imem_addr < RAM_SIZE)
     {
-        buff = ram_load(ram, imem_addr, 8);
+        // buff = ram_load(ram, imem_addr, 8);
+        peripheral_exec_load(imem_addr, sizeof(uint8_t), (uint8_t*)&buff);
         imem_addr++;
         fwrite(&buff, sizeof(uint8_t), 1, mem);
     }

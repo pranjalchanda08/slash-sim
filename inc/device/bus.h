@@ -29,7 +29,7 @@ struct bus
     slash_peripheral_t *next;       /* Next bus in the bus LinkedList */
 };
 
-rv32_err_t register_peripheral(uint8_t *name,
+rv32_err_t peripheral_register(uint8_t *name,
                                size_t base,
                                size_t stride,
                                slash_peripheral_api_t *api,

@@ -29,7 +29,7 @@ static slash_peripheral_t *peripheral_head;
  *
  * @return rv32_err_t
  */
-rv32_err_t register_peripheral(uint8_t *name,
+rv32_err_t peripheral_register(uint8_t *name,
                                size_t base,
                                size_t stride,
                                slash_peripheral_api_t *api,

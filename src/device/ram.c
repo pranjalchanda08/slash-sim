@@ -8,16 +8,32 @@
 /*****************************************************************************************
  * INCLUDES
  *****************************************************************************************/
-#include "inttypes.h"
-#include "ram.h"
-#include "string.h"
-#include "stdlib.h"
-#include "stdio.h"
-#include "logging.h"
+#include <ram.h>
 /*****************************************************************************************
  * GLOBALS
  *****************************************************************************************/
 ram_t g_ram;
+slash_peripheral_t ram_fd;
+
+static rv32_err_t ram_peripheral_load(size_t addr, size_t len, uint8_t *bytes);
+static rv32_err_t ram_peripheral_store(size_t addr, size_t len, uint8_t *bytes);
+
+static slash_peripheral_api_t ram_api = {
+    .load = ram_peripheral_load,
+    .store = ram_peripheral_store,
+};
+
+rv32_err_t init_ram(size_t ram_size)
+{
+    g_ram.mem = (uint8_t *)malloc(ram_size);
+    g_ram.mem_size = ram_size;
+    return peripheral_register("ram", 0x00, 0x10000, &ram_api, &ram_fd);
+}
+
+void deinit_ram()
+{
+    free(g_ram.mem);
+}
 
 static uint8_t dram_load_8(ram_t *ram, uint32_t addr)
 {
@@ -53,19 +69,8 @@ static void dram_store_32(ram_t *ram, uint32_t addr, uint32_t value)
     ram->mem[addr + 3] = (uint8_t)((value >> 24) & 0xff);
 }
 
-ram_t * init_ram(size_t ram_size)
-{
-    g_ram.mem = (uint8_t *)malloc(ram_size);
-    g_ram.mem_size = ram_size;
-    return &g_ram;
-}
 
-void deinit_ram()
-{
-    free(g_ram.mem);
-}
-
-uint32_t ram_load(ram_t *ram, uint32_t addr, uint32_t size)
+static uint32_t ram_load(ram_t *ram, uint32_t addr, uint32_t size)
 {
     if (addr >= ram->mem_size)
     {
@@ -89,7 +94,7 @@ uint32_t ram_load(ram_t *ram, uint32_t addr, uint32_t size)
     return 1;
 }
 
-void ram_store(ram_t *ram, uint32_t addr, uint32_t size, uint32_t value)
+static void ram_store(ram_t *ram, uint32_t addr, uint32_t size, uint32_t value)
 {
     if (addr >= ram->mem_size)
     {
@@ -109,4 +114,16 @@ void ram_store(ram_t *ram, uint32_t addr, uint32_t size, uint32_t value)
         break;
     default:;
     }
+}
+
+static rv32_err_t ram_peripheral_load(size_t addr, size_t len, uint8_t *bytes)
+{
+    *bytes = ram_load(&g_ram, addr, (len * 8));
+    return RV32_SUCCESS;
+}
+
+static rv32_err_t ram_peripheral_store(size_t addr, size_t len, uint8_t *bytes)
+{
+    ram_store(&g_ram, addr, (len * 8), *bytes);
+    return RV32_SUCCESS;
 }
