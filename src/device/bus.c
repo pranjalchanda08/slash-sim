@@ -16,7 +16,7 @@
  *****************************************************************************************/
 static slash_peripheral_t *peripheral_head;
 
-extern const slash_peripheral_cfg splash_dev_tree[];
+extern const slash_peripheral_cfg_t splash_dev_tree[];
 extern const size_t device_tree_size;
 /*****************************************************************************************
  * FUNCTION DEFINATION
@@ -32,7 +32,7 @@ rv32_err_t device_tree_register(void)
     rv32_err_t err;
     for (size_t i = 0; i < device_tree_size; i++)
     {
-        err = peripheral_register((slash_peripheral_cfg *)&splash_dev_tree[i]);
+        err = peripheral_register((slash_peripheral_cfg_t *)&splash_dev_tree[i]);
         RV32_ASSERT(err);
     }
     return RV32_SUCCESS;
@@ -110,7 +110,7 @@ rv32_err_t peripheral_exec_store(size_t store_addr, size_t len, size_t value)
  *
  * @return rv32_err_t
  */
-rv32_err_t peripheral_register(slash_peripheral_cfg *cfg)
+rv32_err_t peripheral_register(slash_peripheral_cfg_t *cfg)
 {
     rv32_err_t err = RV32_SUCCESS;
     slash_peripheral_t *peripheral_ptr = peripheral_head;
@@ -156,7 +156,7 @@ rv32_err_t peripheral_register(slash_peripheral_cfg *cfg)
     if (peripheral_ptr->api.init)
     {
         /* Call Init callback */
-        err = peripheral_ptr->api.init(peripheral_ptr->per_cfg.args);
+        err = peripheral_ptr->api.init(&peripheral_ptr->per_cfg);
     }
 
     return err;
@@ -177,6 +177,10 @@ rv32_err_t peripheral_deregister(char *name)
     {
         if (strcmp(current->per_cfg.name, name) == 0)
         {
+            if (current->api.deinit)
+            {
+                current->api.deinit(&current->per_cfg);
+            }
             if (previous == NULL)
             {
                 // The peripheral to remove is the head
@@ -186,12 +190,6 @@ rv32_err_t peripheral_deregister(char *name)
             {
                 previous->next = current->next;
             }
-
-            if (current->api.deinit)
-            {
-                current->api.deinit();
-            }
-
             free(current);
             LOG_DEBUG("[BUS]: Peripheral \"%s\" deregistered successfully", name);
             return RV32_SUCCESS;

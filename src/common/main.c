@@ -10,13 +10,14 @@
 /*****************************************************************************************
  * INCLUDES
  *****************************************************************************************/
-#include "main.h"
+#include <main.h>
 
 /*****************************************************************************************
  * GLOBALS
  *****************************************************************************************/
 rv32i_csr_t g_rv32i_csr;
 rv32i_ctx_t *g_rv32i_ctx;
+slash_app_config_t g_app_cfg;
 
 /*****************************************************************************************
  * STATICS
@@ -30,7 +31,7 @@ static rv_elf_section_info sections;
 static rv32_err_t rv32_ram_store_elf(char const *file_path, uint32_t *imem_addr);
 static void rv32_ram_dump(char const *asm_name, size_t ram_base_addr);
 static void rv32_cpu_reg_dump(char const *asm_name);
-static rv32_err_t check_args(int argc, char const *argv[]);
+static rv32_err_t parse_args(int argc, char const *argv[]);
 
 /*****************************************************************************************
  * FUNCTION DEFINATION
@@ -50,21 +51,20 @@ int main(int argc, char const *argv[])
     uint32_t entry_point;
 
     LOG_DEBUG("Slash-Sim Startup");
-    err = check_args(argc, argv);
+    err = parse_args(argc, argv);
     RV32_ASSERT(err);
 
     /* Initialise the CPU Context */
-    g_rv32i_ctx = (rv32i_ctx_t *)malloc(sizeof(rv32i_ctx_t));
+    g_rv32i_ctx = (rv32i_ctx_t *)calloc(sizeof(rv32i_ctx_t), 1);
     if (!g_rv32i_ctx)
     {
         return RV32_ERR_MALLOC;
     }
-    memset(g_rv32i_ctx, 0, sizeof(rv32i_ctx_t));
 
     err = device_tree_register();
     RV32_ASSERT_GOTO(err, ramdump_exit);
     /* Read instruction and data binary and save it to the ram instance */
-    err = rv32_ram_store_elf(argv[1], &entry_point);
+    err = rv32_ram_store_elf(g_app_cfg.elf_path, &entry_point);
     RV32_ASSERT_GOTO(err, elf_exit);
 
     printf("\n-------------- Execution Start --------------\n");
@@ -72,8 +72,7 @@ int main(int argc, char const *argv[])
     printf("-------------- Execution End ----------------\n\n");
 
 elf_exit:
-    rv32_ram_dump(argv[2], 0x00);
-    rv32_cpu_reg_dump(argv[2]);
+    rv32_cpu_reg_dump(g_app_cfg.elf_name);
 ramdump_exit:
     err = device_tree_deregister();
     free(g_rv32i_ctx);
@@ -107,29 +106,6 @@ static rv32_err_t rv32_ram_store_elf(char const *file_path, uint32_t *imem_addr)
 }
 
 /*******************************************************************************************
- * @brief Store the current RAM dump of the running program
- *
- * @param[in] asm_name      Name of the program being simulated
- * @param[in] ram_base_addr RAM Base address
- ******************************************************************************************/
-static void rv32_ram_dump(char const *asm_name, size_t ram_base_addr)
-{
-    uint32_t buff;
-    char *out_file_path = malloc(strlen(asm_name) + 20);
-    sprintf(out_file_path, "out/%s/ram_dump.bin", asm_name);
-    LOG_INFO("Saving RAM Dump: %s", out_file_path);
-    FILE *mem = fopen(out_file_path, "wb");
-    free(out_file_path);
-    while (ram_base_addr < RAM_SIZE)
-    {
-        peripheral_exec_load(ram_base_addr, sizeof(uint8_t), (size_t*)&buff);
-        ram_base_addr++;
-        fwrite(&buff, sizeof(uint8_t), 1, mem);
-    }
-    fclose(mem);
-}
-
-/*******************************************************************************************
  * @brief Save the reg dump of the current CPU state
  *
  * @param[in] asm_name  Name of the program running on sim
@@ -146,11 +122,6 @@ static void rv32_cpu_reg_dump(char const *asm_name)
         sprintf(line, "%s: 0x%08x\n", reg_name_list[i], *((uint32_t *)g_rv32i_ctx + i));
         fputs(line, mem);
     }
-    for (size_t i = 0; i < sizeof(rv32i_csr_t) / sizeof(uint32_t); i++)
-    {
-        sprintf(line, "%s: 0x%08x\n", csr_reg_list[i], *((uint32_t* )&g_rv32i_csr + i));
-        fputs(line, mem);
-    }
     free(line);
     free(out_file_path);
     fclose(mem);
@@ -163,7 +134,7 @@ static void rv32_cpu_reg_dump(char const *asm_name)
  * @param argv  Pointer to args
  * @return rv32_err_t
  ******************************************************************************************/
-static rv32_err_t check_args(int argc, char const *argv[])
+static rv32_err_t parse_args(int argc, char const *argv[])
 {
     if (argc < 2)
     {
@@ -172,8 +143,11 @@ static rv32_err_t check_args(int argc, char const *argv[])
     }
     if (argc < 3)
     {
-        LOG_ERROR("ASM name not provided");
+        LOG_ERROR("ELF name not provided");
         return RV32_ERR_ASSERT_PARAM;
     }
+    g_app_cfg.elf_path = argv[1];
+    g_app_cfg.elf_name = argv[2];
+
     return RV32_SUCCESS;
 }

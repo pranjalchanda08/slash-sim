@@ -15,35 +15,35 @@
 #include <device_tree.h>
 
 typedef struct bus slash_peripheral_t;
-
+typedef struct peripheral_cfg slash_peripheral_cfg_t;
 typedef struct peripheral_api
 {
-    rv32_err_t (*init)(void *args);
-    rv32_err_t (*deinit)(void);
+    rv32_err_t (*init)(slash_peripheral_cfg_t *per_cfg);
+    rv32_err_t (*deinit)(slash_peripheral_cfg_t *per_cfg);
     rv32_err_t (*load)(size_t addr, size_t len, size_t *bytes);
     rv32_err_t (*store)(size_t addr, size_t len, size_t bytes);
 } slash_peripheral_api_t;
 
-typedef struct peripheral_cfg
+struct peripheral_cfg
 {
     uint8_t *name;                    /* bus registration name */
     size_t mmio_base;                 /* bus bus address */
     size_t mmio_stride;               /* bus bus length */
     void *args;                       /* Device init args */
     slash_peripheral_api_t *api_list; /* Pre defined API list*/
-} slash_peripheral_cfg;
+};
 
 struct bus
 {
-    slash_peripheral_cfg per_cfg; /* Peripgeral config */
+    slash_peripheral_cfg_t per_cfg; /* Peripgeral config */
     slash_peripheral_api_t api;   /* bus API callback reg */
     slash_peripheral_t *next;     /* Next bus in the bus LinkedList */
 };
 
 rv32_err_t device_tree_register(void);
 rv32_err_t device_tree_deregister(void);
-rv32_err_t peripheral_register(slash_peripheral_cfg *cfg);
 rv32_err_t peripheral_deregister(char *name);
+rv32_err_t peripheral_register(slash_peripheral_cfg_t *cfg);
 rv32_err_t peripheral_exec_load(size_t load_addr, size_t len, size_t *value);
 rv32_err_t peripheral_exec_store(size_t load_addr, size_t len, size_t value);
 
