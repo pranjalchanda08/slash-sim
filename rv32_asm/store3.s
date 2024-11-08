@@ -5,7 +5,7 @@
 _start:
     la a4, _data
     li a0, 0x13
-    sb a0, 1(a4)
+    sw a0, 4(a4)
 
 .section .data
 _data: 
