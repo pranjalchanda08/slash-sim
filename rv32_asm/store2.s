@@ -4,8 +4,8 @@
 
 _start:
     la a4, _data
-    li a0, 0x13
-    sb a0, 1(a4)
+    li a0, 0x1234
+    sh a0, 2(a4)
 
 .section .data
 _data: 
