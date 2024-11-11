@@ -241,3 +241,26 @@ The `xor` instruction performs a bitwise exclusive OR operation between the valu
   - After `xor t2, t0, t1` with `t0 = 0x13` (binary: `0001 0011`) and `t1 = 0x02` (binary: `0000 0010`), `t2` will contain `0x11` (binary: `0001 0001`).
 
 ---
+
+## 19. **Set Less Than Instruction (slt)**
+
+**Instruction**: `slt t2, t0, t1`
+
+The `slt` (Set Less Than) instruction sets register `t2` to `1` if the value in `t0` is less than the value in `t1`, and `0` otherwise. It compares the two values as signed integers.
+
+- **Expected Register Output**:
+  - After `slt t2, t0, t1` with `t0 = 0x13` (19 in decimal) and `t1 = 0x02` (2 in decimal), since `t0` is greater than `t1`, `t2` will contain `0x00`.
+
+---
+
+### 20. **Set Less Than Unsigned Instruction (sltu)**
+
+**Instruction**: `sltu t2, t0, t1`
+
+The `sltu` (Set Less Than Unsigned) instruction sets register `t2` to `1` if the value in `t0` is less than the value in `t1` when treated as unsigned integers, and `0` otherwise.
+
+- **Explanation**:
+  - The `sltu` instruction performs an unsigned comparison: it compares the bit patterns of `t0` and `t1` without considering their sign.
+
+- **Expected Register Output**:
+  - After `sltu t2, t0, t1` with `t0 = 0x13` (19 in decimal) and `t1 = 0x02` (2 in decimal), since `t0` is greater than `t1` in an unsigned context, `t2` will contain `0x00`.
