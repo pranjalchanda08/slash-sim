@@ -1,3 +1,10 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    opcode_tree.c
+ * @brief   File to register rv32 instructions
+ *****************************************************************************************/
 #include "rv32i_fetch_decode.h"
 
 rv32_opcode_sub_fn_t alui_sub_list[] = {
@@ -32,8 +39,9 @@ rv32_opcode_sub_fn_t store_sub_list[] = {
 };
 
 rv32_opcode_sub_fn_t csr_sub_list[] = {
-    RV32_SUB_FUNC_ENTRY(0x00, 0x00, RV_INS_TYPE_I1, execute_csr, "ecall"),
-    RV32_SUB_FUNC_ENTRY(0x00, 0x01, RV_INS_TYPE_I1, execute_csr, "ebreak"),
+RV32_SUB_FUNC_ENTRY(0x01, 0x00, RV_INS_TYPE_I1, execute_csr, "csrw\t$csr, $rs1"),
+RV32_SUB_FUNC_ENTRY(0x02, 0x00, RV_INS_TYPE_I1, execute_csr, "csrr\t$rd, $csr"),
+RV32_SUB_FUNC_ENTRY(0x03, 0x00, RV_INS_TYPE_I1, execute_csr, "csrc\t$csr, $rs1"),
 };
 
 rv32_opcode_sub_fn_t load_sub_list[] = {
@@ -56,7 +64,7 @@ rv32_opcode_sub_fn_t branch_sub_list[] = {
 rv32_opcode_reg_t opcode_reg_list[] = {
     RV32_OPCODE_NO_SUB(RV32_OPCODE_JAL, RV_INS_TYPE_J, execute_jal, "jal\t$rd, $i"),
     RV32_OPCODE_NO_SUB(RV32_OPCODE_LUI, RV_INS_TYPE_U, execute_lui, "lui\t$rd, $i"),
-    RV32_OPCODE_NO_SUB(RV32_OPCODE_JALR, RV_INS_TYPE_I1, execute_jalr,  "jalr\t$rd, $i($r1)"),
+    RV32_OPCODE_NO_SUB(RV32_OPCODE_JALR, RV_INS_TYPE_I1, execute_jalr,  "jalr\t$rd, $i($rs1)"),
     RV32_OPCODE_NO_SUB(RV32_OPCODE_AUIPC, RV_INS_TYPE_U, execute_auipc, "auipc\t$rd, $i"),
     RV32_OPCODE_WITH_SUB(RV32_OPCODE_CSR, csr_sub_list),
     RV32_OPCODE_WITH_SUB(RV32_OPCODE_ALUI, alui_sub_list),

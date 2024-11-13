@@ -1,6 +1,13 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    rv32i_execute.h
+ * @brief   Functions declaration of all execution callbacks
+ *****************************************************************************************/
 #pragma once
 
-#include "main.h"
+#include <main.h>
 
 uint32_t execute_lui(exec_args_t * args);
 uint32_t execute_jal(exec_args_t * args);

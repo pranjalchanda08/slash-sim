@@ -1,3 +1,10 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    opcodes.h
+ * @brief   Opcode declaration
+ *****************************************************************************************/
 #pragma once
 
 typedef enum opcode
@@ -13,4 +20,3 @@ typedef enum opcode
     RV32_OPCODE_JAL = 0x6F,
     RV32_OPCODE_CSR = 0x73, // 8 different CSR instructions
 } rv32_opcode_t;
-

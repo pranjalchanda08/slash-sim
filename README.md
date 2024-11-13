@@ -23,7 +23,7 @@ $ make asm ASM={asm_name}
 
 ## Run
 ```sh
-$ make run ARGS={path_to_asm.bin} ASM={asm_name}
+$ make run ARGS={path_to_asm.elf} ASM={asm_name}
 ```
 
 ## Example run
@@ -74,44 +74,48 @@ SECTIONS
 }
 
 ```
-#### Build add.bin and rv32I_emu
+#### Build add.bin and slash_sim
 ```sh
 $ make clean
 $ make
 $ make asm ASM=add
 ```
-#### Run rv32I_emu
+#### Run slash_sim
 ```sh
-$ make run ARGS=build/add.bin ASM=add
+$ make run ARGS=build/add.elf ASM=add
 ```
 
 #### Output
 ```sh
-make run ARGS=build/add.bin ASM=add
-mkdir -p out/add
-./build/rv32I_emu build/add.bin add
-rv32I emu Startup 
-RAM Init done
-IRAM Space Allocation done: s:0x400, b:0x1000 
-DRAM Space Allocation done: s:0x1000, b:0x2000 
-ibin found. Reading build/add.bin
-Reading binary Success. Max Addr: 0x2010
+$ make run ARGS=build/add.elf ASM=add
+./build/slash_sim build/add.elf add
+[22:40:15.633] [DEBUG]: Slash-Sim Startup
+[22:40:15.634] [DEBUG]: RAM Init done
+==================================================
+  Section Name   |  Offset  |  Size   | Address
+==================================================
+.text            | 0x001000 | 0x0001c | 0x00001000
+.data            | 0x002000 | 0x00011 | 0x00002000
+==================================================
+[22:40:15.634] [DEBUG]: Extracted binary data for section: .text
+[22:40:15.634] [DEBUG]: Extracted binary data for section: .data
+[22:40:15.634] [DEBUG]: Total Memory Layout Size: 0x1011 bytes
+[22:40:15.634] [DEBUG]: Reading binary Success. PC: 0x1000
 
 -------------- Execution Start --------------
-
-[0x00002117]: [PC:0x00001000]: auipc    sp, 0x2000
-[0x00010113]: [PC:0x00001004]: addi     sp, sp, 0x0
-[0x01300293]: [PC:0x00001008]: addi     t0, x0, 0x13
-[0x02300313]: [PC:0x0000100C]: addi     t1, x0, 0x23
-[0x006283B3]: [PC:0x00001010]: add      t2, t0, t1
-[0x00001E97]: [PC:0x00001014]: auipc    t4, 0x1000
-[0xFECE8E93]: [PC:0x00001018]: addi     t4, t4, 0xffffffec
-[0x00000000]: [PC:0x0000101C]: PC reached EOF
+[22:40:15.634] [INFO ]: [0x00002117]: [PC:0x00001000]:  auipc   x2 <sp>   , 0x2000 <8192d>
+[22:40:15.635] [INFO ]: [0x00010113]: [PC:0x00001004]:  addi    x2 <sp>   , x2 <sp>   , 0x00 <00d>
+[22:40:15.635] [INFO ]: [0x01300293]: [PC:0x00001008]:  addi    x5 <t0>   , x0 <zero> , 0x13 <19d>
+[22:40:15.635] [INFO ]: [0x02300313]: [PC:0x0000100C]:  addi    x6 <t1>   , x0 <zero> , 0x23 <35d>
+[22:40:15.635] [INFO ]: [0x006283B3]: [PC:0x00001010]:  add     x7 <t2>   , x5 <t0>   , x6 <t1>
+[22:40:15.635] [INFO ]: [0x00001E97]: [PC:0x00001014]:  auipc   x29 <t4>  , 0x1000 <4096d>
+[22:40:15.635] [INFO ]: [0xFECE8E93]: [PC:0x00001018]:  addi    x29 <t4>  , x29 <t4>  , 0xffffffec <-20d>
+[22:40:15.635] [DEBUG]: PC reached EOF
 -------------- Execution End ----------------
 
-Saving RAM Dump: out/add/ram_dump.bin
-Saving REG Dump: out/add/reg_dump.bin
-RAM De-Init done
+[22:40:15.635] [INFO ]: Saving RAM Dump: out/add/ram_dump.bin
+[22:40:15.636] [INFO ]: Saving REG Dump: out/add/reg_dump.txt
+[22:40:15.637] [DEBUG]: RAM De-Init done
 ```
 
 #### RAM Dump
@@ -119,8 +123,8 @@ RAM De-Init done
 $ hexdump out/add/ram_dump.bin
 0000000 0000 0000 0000 0000 0000 0000 0000 0000
 *
-0001000 0513 0130 0593 0230 0633 00b5 1717 0000
-0001010 0713 ff47 0000 0000 0000 0000 0000 0000
+0001000 2117 0000 0113 0001 0293 0130 0313 0230
+0001010 83b3 0062 1e97 0000 8e93 fece 0000 0000
 0001020 0000 0000 0000 0000 0000 0000 0000 0000
 *
 0002000 7250 6e61 616a 0a6c 4300 6168 646e 0a61     Pranjal Chanda
@@ -131,27 +135,12 @@ $ hexdump out/add/ram_dump.bin
 
 #### CPU REG Dump
 ```sh
-hexdump out/add/reg_dump.bin
-0000000 0000 0000 0000 0000 0000 0000 0000 0000
-*
-0000020 0000 0000 0000 0000 0013 0000 0023 0000
-0000030 0036 0000 0000 0000 2000 0000 0000 0000
-0000040 0000 0000 0000 0000 0000 0000 0000 0000
-*
-0000080 1014 0000
-0000084
+$ grep -v "0x00000000" out/add/reg_dump.txt
+x2 <sp>: 0x00003000
+x5 <t0>: 0x00000013
+x6 <t1>: 0x00000023
+x7 <t2>: 0x00000036
+x29 <t4>: 0x00002000
+pc: 0x0000101c
 ```
-
-### Add an instruction to the build
-
-To add an instruction into the framework we need to do the following:
-1. `opcodes.h`: Add an entry into `rv32_opcode_t` if adding a new opcode.
-    * The decode string shall follow formated string consisting of `$rd`, `$rs1`, `$rs2`, `$i` only.
-    * All immidiate value formats of any instruction structure shall be represented using `$i`.
-2. `opcode_tree.c`: Add entry to `opcode_reg_list` using following macros:
-    * `RV32_OPCODE_NO_SUB`    : API to add an opcode entry to the list with no sub functionality to the opcode.
-    * `RV32_OPCODE_WITH_SUB` : API to add an opcode entry to the list with `n` sub functionality to the opcode.
-    * `RV32_SUB_FUNC_ENTRY` : API to add sub functions in an array.
-3. `rv32_execute.c` : Add callback entry for the instruction execution.
-
 

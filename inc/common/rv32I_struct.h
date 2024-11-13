@@ -1,8 +1,16 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    rv32i_struct.h
+ * @brief   Structure defination of RV32 Instructions
+ *****************************************************************************************/
 #pragma once
 
-#include "inttypes.h"
-#include "platmem.h"
-#include "opcodes.h"
+#include <inttypes.h>
+#include <plat_const.h>
+#include <opcodes.h>
+#include <rv32_csr.h>
 
 #define RV_MASK_U(_wc) (uint32_t)(_wc & 0xFFFFF000)
 #define RV_MASK_J(_wc) ((int32_t)(_wc & 0x80000000) >> 11) | (_wc & 0xFF000) | ((_wc >> 9) & 0x800) | ((_wc >> 20) & 0x7FE)
@@ -139,6 +147,9 @@ typedef struct exec_args
     uint32_t fn7;
     ins_type_t ins_type;
     rv32i_ctx_t *c_ctx;
+    ram_t * ram;
+    csr_t *csr_ctx;
+    uint32_t csr_index;
 } exec_args_t;
 
 typedef uint32_t (*exec)(exec_args_t *args);

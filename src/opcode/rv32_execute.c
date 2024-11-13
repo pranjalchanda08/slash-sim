@@ -1,3 +1,10 @@
+/*****************************************************************************************
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <2024>, Pranjal Chanda
+ *
+ * @file    rv32_execute.c
+ * @brief   File to contain the callback function of decoded instructions
+ *****************************************************************************************/
 #include "rv32i_execute.h"
 
 uint32_t execute_lui(exec_args_t *args)
@@ -11,7 +18,6 @@ uint32_t execute_auipc(exec_args_t *args)
     args->c_ctx->cpu_r_u.xn[args->rd] = args->c_ctx->pc + args->imm;
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
-
 uint32_t execute_jal(exec_args_t *args)
 {
     args->c_ctx->cpu_r_u.xn[args->rd] = args->c_ctx->pc + RV32_PC_JUMP;
@@ -21,7 +27,7 @@ uint32_t execute_jal(exec_args_t *args)
 uint32_t execute_jalr(exec_args_t *args)
 {
     args->c_ctx->cpu_r_u.xn[args->rd] = args->c_ctx->pc + RV32_PC_JUMP;
-    return args->c_ctx->pc + args->imm + args->c_ctx->cpu_r_u.xn[args->rs1];
+    return (args->imm + args->c_ctx->cpu_r_u.xn[args->rs1]) & ~(1 << 0);
 }
 
 uint32_t execute_alur_r_add(exec_args_t *args)
@@ -134,30 +140,36 @@ uint32_t execute_alui_i2_srli(exec_args_t *args)
 
 uint32_t execute_store_s_sb(exec_args_t *args)
 {
-    ram_store(&g_dram_mem, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 8, args->rs2 & 0x000000FF);
+    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 8, args->c_ctx->cpu_r_u.xn[args->rs2] & 0x000000FF);
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
 uint32_t execute_store_s_sh(exec_args_t *args)
 {
-    ram_store(&g_dram_mem, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 16, args->rs2 & 0x0000FFFF);
+    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 16, args->c_ctx->cpu_r_u.xn[args->rs2] & 0x0000FFFF);
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
 uint32_t execute_store_s_sw(exec_args_t *args)
 {
-    ram_store(&g_dram_mem, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 32, args->rs2 & 0xFFFFFFFF);
+    ram_store(args->ram, args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm, 32, args->c_ctx->cpu_r_u.xn[args->rs2] & 0xFFFFFFFF);
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
-uint32_t execute_csr(exec_args_t *args)
-{
-    switch (args->fn3)
-    {
-        /* CSR not supported yet */
-    default:
-        break;
-    }
+uint32_t execute_csr(exec_args_t *args) {
+    uint32_t csr_address = args->imm;
+    uint32_t rs1_value = args->c_ctx->cpu_r_u.xn[args->rs1];
+        switch (args->fn3) {
+            case 0x01:
+                *(args->csr_ctx[args->csr_index].value) = rs1_value;
+                break;
+            case 0x02:
+                args->c_ctx->cpu_r_u.xn[args->rd] = *(args->csr_ctx[args->csr_index].value);
+                break;
+            case 0x03:
+                *(args->csr_ctx[args->csr_index].value) &= ~rs1_value;
+                break;
+        }
     return args->c_ctx->pc + RV32_PC_JUMP;
 }
 
@@ -169,7 +181,7 @@ uint32_t execute_load(exec_args_t *args)
         /* lb (rd = mmio8(rs1+imm_1)) */
         args->c_ctx->cpu_r_u.xn[args->rd] = 0xFFFFFF00;
         args->c_ctx->cpu_r_u.xn[args->rd] |=
-            ram_load(&g_dram_mem,
+            ram_load(args->ram,
                      args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm,
                      8);
         break;
@@ -177,7 +189,7 @@ uint32_t execute_load(exec_args_t *args)
         /* lbu (rd = mmio8(rs1+imm_1)) */
         args->c_ctx->cpu_r_u.xn[args->rd] = 0x00000000;
         args->c_ctx->cpu_r_u.xn[args->rd] |=
-            ram_load(&g_dram_mem,
+            ram_load(args->ram,
                      args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm,
                      8);
         break;
@@ -185,7 +197,7 @@ uint32_t execute_load(exec_args_t *args)
         /* lh (rd = mmio16(rs1+imm_1)) */
         args->c_ctx->cpu_r_u.xn[args->rd] = 0xFFFFFF00;
         args->c_ctx->cpu_r_u.xn[args->rd] |=
-            ram_load(&g_dram_mem,
+            ram_load(args->ram,
                      args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm,
                      16);
         break;
@@ -193,7 +205,7 @@ uint32_t execute_load(exec_args_t *args)
         /* lhu (rd = mmio16(rs1+imm_1)) */
         args->c_ctx->cpu_r_u.xn[args->rd] = 0x00000000;
         args->c_ctx->cpu_r_u.xn[args->rd] |=
-            ram_load(&g_dram_mem,
+            ram_load(args->ram,
                      args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm,
                      16);
         break;
@@ -201,7 +213,7 @@ uint32_t execute_load(exec_args_t *args)
         /* lw (rd = mmio16(rs1+imm_1)) */
         args->c_ctx->cpu_r_u.xn[args->rd] = 0xFFFFFF00;
         args->c_ctx->cpu_r_u.xn[args->rd] |=
-            ram_load(&g_dram_mem,
+            ram_load(args->ram,
                      args->c_ctx->cpu_r_u.xn[args->rs1] + args->imm,
                      32);
         break;
@@ -219,37 +231,37 @@ uint32_t execute_branch(exec_args_t *args)
     case 0x00:
         /* beq (pc = pc + (rs1==rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 (args->c_ctx->cpu_r_u.xn[args->rs1] == args->c_ctx->cpu_r_u.xn[args->rs1]
+                 (args->c_ctx->cpu_r_u.xn[args->rs1] == args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     case 0x01:
         /* bne (pc = pc + (rs1!=rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 (args->c_ctx->cpu_r_u.xn[args->rs1] != args->c_ctx->cpu_r_u.xn[args->rs1]
+                 (args->c_ctx->cpu_r_u.xn[args->rs1] != args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     case 0x04:
         /* blt (pc = pc + (rs1<rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 ((int32_t)args->c_ctx->cpu_r_u.xn[args->rs1] < (int32_t)args->c_ctx->cpu_r_u.xn[args->rs1]
+                 ((int32_t)args->c_ctx->cpu_r_u.xn[args->rs1] < (int32_t)args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     case 0x05:
         /* bgt (pc = pc + (rs1>=rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 ((int32_t)args->c_ctx->cpu_r_u.xn[args->rs1] >= (int32_t)args->c_ctx->cpu_r_u.xn[args->rs1]
+                 ((int32_t)args->c_ctx->cpu_r_u.xn[args->rs1] >= (int32_t)args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     case 0x06:
         /* bltu (pc = pc + (rs1<rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 (args->c_ctx->cpu_r_u.xn[args->rs1] < args->c_ctx->cpu_r_u.xn[args->rs1]
+                 (args->c_ctx->cpu_r_u.xn[args->rs1] < args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     case 0x07:
         /* bgtu (pc = pc + (rs1>=rs2 ? imm_i : 4)*/
         ret_pc = ret_pc +
-                 (args->c_ctx->cpu_r_u.xn[args->rs1] >= args->c_ctx->cpu_r_u.xn[args->rs1]
+                 (args->c_ctx->cpu_r_u.xn[args->rs1] >= args->c_ctx->cpu_r_u.xn[args->rs2]
                       ? args->imm : RV32_PC_JUMP);
         break;
     default:

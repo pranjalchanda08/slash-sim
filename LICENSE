@@ -1,21 +1,107 @@
-MIT License
+SLASH-SIM LICENSE
 
-Copyright (c) 2024 Pranjal Chanda
+Copyright (C) 2024, Pranjal Chanda
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Everyone is permitted to copy and distribute verbatim copies of this license
+document, but changing it is not allowed.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+--------------------------------------------------------------------------------
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Preamble
+
+Slash-sim license is intended to protect the efforts and intellectual property
+of codebase owner and its users from any claims that are not in terms of this
+--------------------------------------------------------------------------------
+license agreement. This license will be updated from time to time. No one
+other than Pranjal Chanda, here after called as Software Owner has rights
+to make any changes to this license.
+
+Using or implementing the Software by any User will automatically tantamount to
+unconditionally agreeing to the terms of this license.
+
+--------------------------------------------------------------------------------
+
+Terms And Conditions
+
+0.  Definitions:
+    i.    Software: This defines source codes, binaries, documentation, algorithms,
+    designs, architectures, methodologies, principles, technical content such as 
+    concepts, terminology, ontology, etc., in part or in whole or packaged with other
+    binaries in whole or as a subset or derived binaries.
+
+    ii.   Contributors: This defines any entity or Individual who suggests, makes,
+    changes and/or adds to the Software and such changes and/or additions are included
+    in the codebase for further benefit to the community.
+
+    iii.  Individual: This defines any person who uses Software for personal
+    purpose without any commercial gain.
+
+    iv.   Organisation: This defines any entity that creates, develops, manufactures,
+    markets, sells, distributes technology products using this Software for commercial
+    purposes or otherwise.
+
+    v.    User: This defines any Individual and/or Organisation who use this Software.
+
+1.  Copy, Use and Distributions:
+    i.    Any individual or organisation is permitted to copy, use, distribute
+    Software for commercial use or otherwise at their own risk and responsibility
+    with no liability to the Software Owner or it's CONTRIBUTORS.
+
+    ii.   All distributions of Software by Users shall be without any claim of Copyright 
+    on such distributions at their own risk and responsibilities without any liability
+    to the Software Owner and CONTRIBUTORS. Such distributions of Software must include
+    conspicuously and explicitly this license in whole without any changes.
+
+2.  Modifications, Changes, Upgrade and Add:
+    i.    Individuals may modify, change or upgrade the Software at their own risk
+    and responsibility.
+
+    ii.   Organisations may modify, change, upgrade or add new capability at their
+    risk and responsibility. 
+
+3.  Patents, Intellectual Property and Copyrights:
+    No Individual or No Organisation may claim Intellectual Property rights for the
+    changes made to the Software by them. All the Software together with its changes,
+    additions submitted will be covered under this license for further use and
+    distribution.
+
+4.  Commercials:
+    The Software will be available to Individuals and Organisations at NO COST.
+
+7.  No Warranty, No Liability and Indemnity:
+    Because the Software is licensed free of cost, by accepting this license the
+    Individuals and the Organisations are deemed to accept that there is NO WARRANTY
+    of any kind for the Software.
+
+    Individuals and Organisations will own any LIABILITY arising out of the use,
+    distributions of the Software, it's changes, additions if any, commercial or
+    otherwise.
+
+    Individuals and Organisations unconditionally INDEMNIFY Software Owner and it's
+    CONTRIBUTORS from ANY DAMAMGES, LAW SUITS, LIABILITIES AND ANY RESPONSIBILITY 
+    arising out of the use and/or distribution of the Software together with it's
+    changes, it's modification, it's upgrade and/or it's additions commercially or
+    otherwise.
+
+8.  Copyrights:
+    All copyrights of the Software together with submitted modifications, changes,
+    upgrades and/or additions, are unconditionally held by Software Owner.
+    CONTRIBUTORS are permitted to showcase their work but are not permitted to
+    own the Software.
+
+End of Terms and Conditions
+
+--------------------------------------------------------------------------------
+
+How to apply these terms to new additions
+
+Software contributors must use the below provided file header template in their work.
+
+<header start>
+/*
+ * SLASH-SIM LICENSE
+ * Copyrights (C) <yyyy>, Pranjal Chanda
+ */
+<header end>
+
+--------------------------------------------------------------------------------

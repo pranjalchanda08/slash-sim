@@ -2,13 +2,16 @@
  * SLASH-SIM LICENSE
  * Copyrights (C) <2024>, Pranjal Chanda
  *
- * @file    rv32_fetch_decode.h
- * @brief   Functions declaration related to Instruction fetch and decode
+ * @file    plat_const.h
+ * @brief   Provides platform constants
  *****************************************************************************************/
 #pragma once
 
-#include <main.h>
+#define K   *1024
 
-void rv32_fetch(ram_t *ram, uint32_t pc);
-void rv32_decode(uint32_t word, ram_t *ram);
-int rv32_get_csr_index(uint32_t csr_address);
+#ifndef RAM_SIZE
+#define RAM_SIZE  16 K
+#endif
+
+#define RV32_PC_JUMP    sizeof(uint32_t)
+#define RV32_XLEN_BIT   32
