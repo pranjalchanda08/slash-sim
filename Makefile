@@ -3,7 +3,6 @@ CC = gcc
 CXX = g++
 
 # Function to normalize version strings into a numeric format for easier comparison
-# Converts version like 11.0.0 to 110000/9.3.0 to 903000
 define normalize_version
   $(shell echo $(1) | awk -F. '{ printf "%d%02d%02d", $$1, $$2, $$3 }')
 endef
@@ -15,7 +14,7 @@ GCC_VERSION := $(shell riscv64-unknown-elf-gcc --version | head -n 1 | sed 's/.*
 # Normalize GCC version numbers for comparison
 MIN_VERSION_NUMERIC := $(call normalize_version, $(GCC_MIN_VERSION)) # Converts 11.0.0 -> 110000
 CURRENT_VERSION_NUMERIC := $(call normalize_version, $(GCC_VERSION))  # Converts 9.3.0 -> 90300
-$(info GCC version: $(CURRENT_VERSION_NUMERIC))
+
 # Issue a warning if the GCC version is lower than the minimum required version
 ifeq ($(shell [ $(CURRENT_VERSION_NUMERIC) -lt $(MIN_VERSION_NUMERIC) ] && echo 1 || echo 0), 1)
 $(warning Bad toolchain version $(GCC_VERSION). Minimum required: $(GCC_MIN_VERSION))
@@ -44,17 +43,23 @@ else
     MARCH_FLAG := -march=rv32i
 endif
 
-OBJ_FILES :=
 # Include subdirectory build.mk files
 include $(wildcard src/**/build.mk)
+include $(ASMDIR)/rv32_asm.mk
 
-# Define object files
 OBJS := $(OBJ_FILES)
 DEPS := $(OBJS_FILES:.o=.d)
-
+ASM ?=
 SM ?=
 ARGS ?=
 LD_FILE ?= rv32.ld
+
+export BUILD_DIR
+export MARCH_FLAG
+export LD_FILE
+export ASMDIR
+export ASM
+
 # Default target
 all: $(BUILD_DIR)/$(TARGET_EXEC)
 
@@ -62,21 +67,6 @@ all: $(BUILD_DIR)/$(TARGET_EXEC)
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	@mkdir -p $(dir $@)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
-
-# Compile C files
-$(BUILD_DIR)/%.c.o: %.c
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Compile C++ files
-$(BUILD_DIR)/%.cpp.o: %.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Compile Assembly files
-$(BUILD_DIR)/%.s.o: %.s
-	@mkdir -p $(dir $@)
-	$(AS) $(ASFLAGS) -c $< -o $@
 
 # Run target (optional: for execution after build)
 run: all
@@ -88,15 +78,10 @@ debug: all
 	@mkdir -p $(OUT_DIR)/$(ASM)
 	gdb --args ./$(BUILD_DIR)/$(TARGET_EXEC) $(ARGS) $(ASM)
 
-# Assembly build target
-asm:
-	@mkdir -p ./$(BUILD_DIR)
-	riscv64-unknown-elf-gcc $(MARCH_FLAG) -mabi=ilp32 -static -nostdlib -T$(ASMDIR)/$(LD_FILE) $(ASMDIR)/$(ASM).s -o $(BUILD_DIR)/$(ASM).elf
-	riscv64-unknown-elf-objcopy -O binary $(BUILD_DIR)/$(ASM).elf $(BUILD_DIR)/$(ASM).bin
-
 # Clean up build files
 clean:
 	@rm -rf $(BUILD_DIR) $(OUT_DIR)
+	
 
 # Include generated dependency files
 -include $(DEPS)
