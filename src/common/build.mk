@@ -1,5 +1,3 @@
-# src/common/build.mk
-
 # Separate source files by type
 C_SRCS := $(wildcard src/common/*.c)
 CPP_SRCS := $(wildcard src/common/*.cpp)
@@ -9,9 +7,9 @@ S_SRCS := $(wildcard src/common/*.s)
 SRCS := $(C_SRCS) $(CPP_SRCS) $(S_SRCS)
 
 # Object files based on source type
-C_OBJS := $(C_SRCS:src/common/%.c=$(OUT_DIR)/common/%.o)
-CPP_OBJS := $(CPP_SRCS:src/common/%.cpp=$(OUT_DIR)/common/%.o)
-S_OBJS := $(S_SRCS:src/common/%.s=$(OUT_DIR)/common/%.o)
+C_OBJS := $(C_SRCS:src/common/%.c=$(BUILD_DIR)/common/%.o)
+CPP_OBJS := $(CPP_SRCS:src/common/%.cpp=$(BUILD_DIR)/common/%.o)
+S_OBJS := $(S_SRCS:src/common/%.s=$(BUILD_DIR)/common/%.o)
 
 # Include flags
 INC_FLAGS := $(addprefix -I, $(INC_DIRS))
@@ -20,17 +18,17 @@ CFLAGS := $(CPPFLAGS)
 CXXFLAGS ?= g++
 
 # Compile rules for C files
-$(OUT_DIR)/common/%.o: src/common/%.c
+$(BUILD_DIR)/common/%.o: src/common/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Compile rules for C++ files
-$(OUT_DIR)/common/%.o: src/common/%.cpp
+$(BUILD_DIR)/common/%.o: src/common/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Compile rules for Assembly files
-$(OUT_DIR)/common/%.o: src/common/%.s
+$(BUILD_DIR)/common/%.o: src/common/%.s
 	@mkdir -p $(dir $@)
 	$(AS) -c $< -o $@
 

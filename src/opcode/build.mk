@@ -1,4 +1,4 @@
-# src/opcode/build.mk
+
 
 # Separate source files by type
 C_SRCS := $(wildcard src/opcode/*.c)
@@ -9,9 +9,9 @@ S_SRCS := $(wildcard src/opcode/*.s)
 SRCS := $(C_SRCS) $(CPP_SRCS) $(S_SRCS)
 
 # Object files based on source type
-C_OBJS := $(C_SRCS:src/opcode/%.c=$(OUT_DIR)/opcode/%.o)
-CPP_OBJS := $(CPP_SRCS:src/opcode/%.cpp=$(OUT_DIR)/opcode/%.o)
-S_OBJS := $(S_SRCS:src/opcode/%.s=$(OUT_DIR)/opcode/%.o)
+C_OBJS := $(C_SRCS:src/opcode/%.c=$(BUILD_DIR)/opcode/%.o)
+CPP_OBJS := $(CPP_SRCS:src/opcode/%.cpp=$(BUILD_DIR)/opcode/%.o)
+S_OBJS := $(S_SRCS:src/opcode/%.s=$(BUILD_DIR)/opcode/%.o)
 
 # Include flags
 INC_FLAGS := $(addprefix -I, $(INC_DIRS))
@@ -20,17 +20,17 @@ CFLAGS := $(CPPFLAGS)
 CXXFLAGS := g++
 
 # Compile rules for C files
-$(OUT_DIR)/opcode/%.o: src/opcode/%.c
+$(BUILD_DIR)/opcode/%.o: src/opcode/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Compile rules for C++ files
-$(OUT_DIR)/opcode/%.o: src/opcode/%.cpp
+$(BUILD_DIR)/opcode/%.o: src/opcode/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Compile rules for Assembly files
-$(OUT_DIR)/opcode/%.o: src/opcode/%.s
+$(BUILD_DIR)/opcode/%.o: src/opcode/%.s
 	@mkdir -p $(dir $@)
 	$(AS) -c $< -o $@
 

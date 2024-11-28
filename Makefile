@@ -3,7 +3,7 @@ CC = gcc
 CXX = g++
 
 # Function to normalize version strings into a numeric format for easier comparison
-# Converts version like 11.0.0 to 110000
+# Converts version like 11.0.0 to 110000/9.3.0 to 903000
 define normalize_version
   $(shell echo $(1) | awk -F. '{ printf "%d%02d%02d", $$1, $$2, $$3 }')
 endef
@@ -15,7 +15,7 @@ GCC_VERSION := $(shell riscv64-unknown-elf-gcc --version | head -n 1 | sed 's/.*
 # Normalize GCC version numbers for comparison
 MIN_VERSION_NUMERIC := $(call normalize_version, $(GCC_MIN_VERSION)) # Converts 11.0.0 -> 110000
 CURRENT_VERSION_NUMERIC := $(call normalize_version, $(GCC_VERSION))  # Converts 9.3.0 -> 90300
-
+$(info GCC version: $(CURRENT_VERSION_NUMERIC))
 # Issue a warning if the GCC version is lower than the minimum required version
 ifeq ($(shell [ $(CURRENT_VERSION_NUMERIC) -lt $(MIN_VERSION_NUMERIC) ] && echo 1 || echo 0), 1)
 $(warning Bad toolchain version $(GCC_VERSION). Minimum required: $(GCC_MIN_VERSION))
