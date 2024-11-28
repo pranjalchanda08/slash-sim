@@ -1,15 +1,8 @@
-# Collect all build.mk files from subdirectories of src/
-BUILD_MK_FILES := $(wildcard src/*/build.mk)
-
-# Include each subdirectory's build.mk
-include $(BUILD_MK_FILES)
-
-# Aggregate all objects from subdirectories into SRC_OBJS
-SRC_OBJS := $(foreach mk, $(BUILD_MK_FILES), $(OBJ_EXPORTS))
-
-# Export SRC_OBJS to the top-level Makefile
-export SRC_OBJS
-include src/common/build.mk
-include src/device/build.mk
-include src/opcode/build.mk
-include src/tools/build.mk
+# This Makefile will collect all object files from subdirectories
+OBJ_FILES :=
+# Collect all object files from subdirectories
+OBJ_FILES += $(shell find src/common -name '*.o')
+OBJ_FILES += $(shell find src/device -name '*.o')
+OBJ_FILES += $(shell find src/tools -name '*.o')
+# Export OBJ_FILES to the parent Makefile
+export OBJ_FILES
