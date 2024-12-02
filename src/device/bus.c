@@ -44,7 +44,7 @@ rv32_err_t device_tree_register(void)
             LOG_FATAL("[BUS]: Overlappingmemory address for \"%s\"", splash_dev_tree[i].name);
             return RV32_ERR_PERI_BUS_ERROR;
         }
-        bus_limit = splash_dev_tree[i].mmio_stride + 1;
+        bus_limit = splash_dev_tree[i].mmio_stride;
         err = peripheral_register((slash_peripheral_cfg_t *)&splash_dev_tree[i]);
         RV32_ASSERT(err);
     }
