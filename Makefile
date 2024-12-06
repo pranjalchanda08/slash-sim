@@ -1,12 +1,30 @@
+
+
+# Compiler definitions
 CC = gcc
 CXX = g++
-#Checks the compiler version and associate corresponding flag
-# eg : for [version > 11] _zicsr flag is required
-GCC_VERSION := $(shell riscv64-unknown-elf-gcc --version | head -n 1 | awk '{print $$3}')
-GCC_MAJOR := $(word 1, $(subst ., ,$(GCC_VERSION)))
-GCC_MINOR := $(word 2, $(subst ., ,$(GCC_VERSION)))
 
+# Function to normalize version strings
+define normalize_version
+$(shell echo $(1) | awk -F. '{ printf "%d%02d%02d", $$1, $$2, $$3 }')
+endef
+
+# Minimum required GCC version
+GCC_MIN_VERSION := 11.0.0
+GCC_VERSION := $(shell riscv64-unknown-elf-gcc --version | head -n 1 | sed 's/.* //')
+
+# Normalize version numbers for comparison
+MIN_VERSION_NUMERIC := $(call normalize_version,$(GCC_MIN_VERSION))
+CURRENT_VERSION_NUMERIC := $(call normalize_version,$(GCC_VERSION))
+
+# Target executable name
 TARGET_EXEC := slash_sim
+
+# Default variables
+ASM ?=
+SM ?=
+ARGS ?=
+LD_FILE ?= rv32.ld
 
 # Directory structure
 BUILD_DIR := build
@@ -14,71 +32,86 @@ OUT_DIR := out
 SRC_DIRS := src
 ASMDIR ?= rv32_asm
 
-# Locate all source files (C, C++, Assembly)
-SRCS := $(shell find $(SRC_DIRS) -type f \( -name '*.cpp' -o -name '*.c' -o -name '*.s' \))
-
-# Convert source paths to object paths (e.g., src/foo.c -> build/src/foo.c.o)
-OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
-DEPS := $(OBJS:.o=.d)
-
 # Include directories
 INC_DIRS := $(wildcard inc/*)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Compilation flags
 CPPFLAGS := $(INC_FLAGS) -MMD -MP
+CFLAGS := $(CPPFLAGS)
+CXXFLAGS ?= g++
 
-ifeq ($(shell test $(GCC_MAJOR) -ge 11 && echo 1), 1)
-    MARCH_FLAG := -march=rv32i_zicsr
-else
-    MARCH_FLAG := -march=rv32i
+# Export common variables
+export BUILD_DIR
+export MARCH_FLAG
+export LD_FILE
+export ASMDIR
+export ASM
+
+# Version check
+ifeq ($(shell [ $(CURRENT_VERSION_NUMERIC) -lt $(MIN_VERSION_NUMERIC) ] && echo 1 || echo 0), 1)
+$(warning Bad toolchain version $(GCC_VERSION). Minimum required: $(GCC_MIN_VERSION))
 endif
 
-ASM ?=
-ARGS ?=
-LD_FILE ?= rv32.ld
+
+# Set MARCH_FLAG based on GCC version
+ifeq ($(shell [ $(CURRENT_VERSION_NUMERIC) -lt $(MIN_VERSION_NUMERIC) ] && echo 1 || echo 0), 0)
+MARCH_FLAG := -march=rv32i_zicsr
+else
+MARCH_FLAG := -march=rv32i
+endif
+
+# Include src.mk to collect object files
+include $(SRC_DIRS)/src.mk
+
+# Include build.mk files from subdirectories
+include $(wildcard $(SRC_DIRS)/**/build.mk)
+include $(ASMDIR)/rv32_asm.mk
 
 # Default target
-.PHONY: all
 all: $(BUILD_DIR)/$(TARGET_EXEC)
 
-# Link final executable
-$(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
+# Link the final executable
+$(BUILD_DIR)/$(TARGET_EXEC): $(OBJ_FILES)
 	@mkdir -p $(dir $@)
-	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
+	$(CXX) $(OBJ_FILES) -o $@ $(LDFLAGS)
 
-# Pattern rule for building C and C++ files
-$(BUILD_DIR)/%.c.o: %.c
-	@mkdir -p $(dir $@)
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+# Compilation rules
+define COMPILE_TEMPLATE
+$(BUILD_DIR)/$(2)/%.o: $(3)/%.$(1)
+	@mkdir -p $$(dir $$@)
+	$(if $(filter c,$(1)),$(CC) $(CFLAGS),$(if $(filter cpp,$(1)),$(CXX) $(CXXFLAGS),$(AS))) -c $$< -o $$@
+endef
 
-$(BUILD_DIR)/%.cpp.o: %.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+# Generate compilation rules for all directories
+$(eval $(call COMPILE_TEMPLATE,c,common,src/common))
+$(eval $(call COMPILE_TEMPLATE,cpp,common,src/common))
+$(eval $(call COMPILE_TEMPLATE,s,common,src/common))
+$(eval $(call COMPILE_TEMPLATE,c,device,src/device))
+$(eval $(call COMPILE_TEMPLATE,cpp,device,src/device))
+$(eval $(call COMPILE_TEMPLATE,s,device,src/device))
+$(eval $(call COMPILE_TEMPLATE,c,opcode,src/opcode))
+$(eval $(call COMPILE_TEMPLATE,cpp,opcode,src/opcode))
+$(eval $(call COMPILE_TEMPLATE,s,opcode,src/opcode))
+$(eval $(call COMPILE_TEMPLATE,c,tools,src/tools))
+$(eval $(call COMPILE_TEMPLATE,cpp,tools,src/tools))
+$(eval $(call COMPILE_TEMPLATE,s,tools,src/tools))
 
 # Run target
-.PHONY: run
 run: all
 	@mkdir -p $(OUT_DIR)/$(ASM)
 	./$(BUILD_DIR)/$(TARGET_EXEC) $(ARGS) $(ASM)
 
 # Debug target
-.PHONY: debug
 debug: all
 	@mkdir -p $(OUT_DIR)/$(ASM)
 	gdb --args ./$(BUILD_DIR)/$(TARGET_EXEC) $(ARGS) $(ASM)
 
-# Assembly build target
-.PHONY: asm
-asm:
-	@mkdir -p ./$(BUILD_DIR)
-	riscv64-unknown-elf-gcc $(MARCH_FLAG) -mabi=ilp32 -static -nostdlib -T$(ASMDIR)/$(LD_FILE) $(ASMDIR)/$(ASM).s -o $(BUILD_DIR)/${ASM}.elf
-	riscv64-unknown-elf-objcopy -O binary $(BUILD_DIR)/$(ASM).elf $(BUILD_DIR)/$(ASM).bin
-
 # Clean up build files
-.PHONY: clean
 clean:
 	@rm -rf $(BUILD_DIR) $(OUT_DIR)
 
 # Include generated dependency files
--include $(DEPS)
+-include $(OBJ_FILES:.o=.d)
+
+.PHONY: all run debug clean
