@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <ram.h>
+#include <bus.h>
 
 typedef struct {
     char *name;
@@ -22,4 +22,4 @@ typedef struct {
     bool loadable;
 } rv_elf_section_info;
 
-int read_elf(FILE *file, size_t *entry_point, ram_t *ram);
+int read_elf(FILE *file, size_t *entry_point);
