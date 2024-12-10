@@ -98,6 +98,7 @@ static uint32_t ram_load(ram_t *ram, uint32_t addr, uint32_t size)
         return dram_load_32(ram, addr);
         break;
     default:
+        LOG_ERROR("[RAM]: Assymetric memory access");
         break;
     }
     return 1;
@@ -121,7 +122,9 @@ static void ram_store(ram_t *ram, uint32_t addr, uint32_t size, uint32_t value)
     case 32:
         dram_store_32(ram, addr, value);
         break;
-    default:;
+    default:
+        LOG_ERROR("[RAM]: Assymetric memory access");
+        break;
     }
 }
 
