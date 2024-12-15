@@ -21,9 +21,9 @@
  *
  * Finally add the device in the array using SLASH_PERIPHERAL_REG(<NAME>, <&api_list>)
  */
-const slash_peripheral_cfg_t splash_dev_tree[] =
+const slash_peripheral_cfg_t slash_dev_tree[] =
 {
     SLASH_PERIPHERAL_REG(RAM, &ram_peripheral_api),
 };
 
-const size_t device_tree_size = sizeof(splash_dev_tree)/sizeof(slash_peripheral_cfg_t);
+const size_t device_tree_size = sizeof(slash_dev_tree)/sizeof(slash_peripheral_cfg_t);
