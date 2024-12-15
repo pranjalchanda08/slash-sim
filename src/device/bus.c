@@ -16,7 +16,7 @@
  *****************************************************************************************/
 static slash_peripheral_t *peripheral_head;
 
-extern const slash_peripheral_cfg_t splash_dev_tree[];
+extern const slash_peripheral_cfg_t slash_dev_tree[];
 extern const size_t device_tree_size;
 
 volatile uint32_t bus_reg_max_addr = 0;
@@ -34,13 +34,13 @@ rv32_err_t device_tree_register(void)
     rv32_err_t err;
     for (size_t i = 0; i < device_tree_size; i++)
     {
-        if (!((splash_dev_tree[i].mmio_base >= bus_reg_max_addr) || (splash_dev_tree[i].mmio_base == 0 && bus_reg_max_addr == 0)))
+        if (!((slash_dev_tree[i].mmio_base >= bus_reg_max_addr) || (slash_dev_tree[i].mmio_base == 0 && bus_reg_max_addr == 0)))
         {
-            LOG_FATAL("[BUS]: Overlappingmemory address for \"%s\"", splash_dev_tree[i].name);
+            LOG_FATAL("[BUS]: Overlappingmemory address for \"%s\"", slash_dev_tree[i].name);
             return RV32_ERR_PERI_BUS_ERROR;
         }
-        bus_reg_max_addr = splash_dev_tree[i].mmio_base + splash_dev_tree[i].mmio_stride;
-        err = peripheral_register((slash_peripheral_cfg_t *)&splash_dev_tree[i]);
+        bus_reg_max_addr = slash_dev_tree[i].mmio_base + slash_dev_tree[i].mmio_stride;
+        err = peripheral_register((slash_peripheral_cfg_t *)&slash_dev_tree[i]);
         RV32_ASSERT(err);
     }
     return RV32_SUCCESS;
@@ -51,7 +51,7 @@ rv32_err_t device_tree_deregister(void)
     rv32_err_t err;
     for (size_t i = 0; i < device_tree_size; i++)
     {
-        err = peripheral_deregister((char *)splash_dev_tree[i].name);
+        err = peripheral_deregister((char *)slash_dev_tree[i].name);
         RV32_ASSERT(err);
     }
     return RV32_SUCCESS;
