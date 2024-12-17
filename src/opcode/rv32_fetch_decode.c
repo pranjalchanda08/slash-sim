@@ -220,8 +220,9 @@ void decode_type(ins_type_t ins_type)
     }
 }
 
-void rv32_decode(uint32_t word, ram_t *ram)
+void rv32_decode(uint32_t word)
 {
+    rv32_err_t err;
     type_u.wordcode = word;
     const char *dec_str;
     exec exec_cb;
@@ -271,7 +272,6 @@ void rv32_decode(uint32_t word, ram_t *ram)
     uint32_t csr_instruction = (type_u.wordcode >> 20) & 0xFFF;
     args.csr_index = rv32_get_csr_index(csr_instruction);
     args.c_ctx = g_rv32i_ctx;
-    args.ram = ram;
     args.csr_ctx = csr_list;
     decode_and_print(dec_str, args.rd, args.rs1, args.rs2, args.imm, args.csr_index, formatted);
     LOG_INFO("[0x%08X]: [PC:0x%08X]:\t%s", type_u.wordcode, g_rv32i_ctx->pc, formatted);
@@ -281,23 +281,35 @@ void rv32_decode(uint32_t word, ram_t *ram)
         g_rv32i_ctx += RV32_PC_JUMP;
         return;
     }
-    g_rv32i_ctx->pc = exec_cb(&args);
+    err = exec_cb(&args, (size_t *)&g_rv32i_ctx->pc);
+    if (err)
+    {
+        /* TODO: Raise Exception */
+        LOG_ERROR("EXEC Error: 0x%x, %d", g_rv32i_ctx->pc, err);
+    }
 }
 
-void rv32_fetch(ram_t *ram, uint32_t pc)
+void rv32_fetch(uint32_t pc)
 {
+    rv32_err_t err;
     /* Initialise PC */
     g_rv32i_ctx->pc = pc;
     uint32_t wordcode;
     while (1)
     {
-        wordcode = ram_load(ram, g_rv32i_ctx->pc, 32);
-        if (!wordcode)
+        err = peripheral_exec_load(g_rv32i_ctx->pc, sizeof(uint32_t), (size_t*)&wordcode);
+        if (err)
+        {
+            /* TODO: Raise Exception */
+            LOG_ERROR("LOAD Error: 0x%x", g_rv32i_ctx->pc);
+            return;
+        }
+        else if (!wordcode)
         {
             LOG_DEBUG("PC reached EOF");
             break;
         }
-        rv32_decode(wordcode, ram);
+        rv32_decode(wordcode);
     }
 }
 

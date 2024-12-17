@@ -147,12 +147,11 @@ typedef struct exec_args
     uint32_t fn7;
     ins_type_t ins_type;
     rv32i_ctx_t *c_ctx;
-    ram_t * ram;
     csr_t *csr_ctx;
     uint32_t csr_index;
 } exec_args_t;
 
-typedef uint32_t (*exec)(exec_args_t *args);
+typedef rv32_err_t (*exec)(exec_args_t *args, size_t *next_pc);
 
 typedef struct rv32_opcode_sub_fn
 {
@@ -176,7 +175,7 @@ typedef struct rv32_opcode_reg
     .ins_type = _type,                                      \
     .code = _opcode,                                        \
     .dec_str = _dec_str,                                    \
-    .exec_cb = (exec)_cb,                                   \
+    .exec_cb = _cb,                                         \
     .sub_fn_list = NULL}
 
 #define RV32_OPCODE_WITH_SUB(_opcode, _sub_lst) { \
@@ -188,5 +187,5 @@ typedef struct rv32_opcode_reg
     .fn3 = _fn3,                                                \
     .fn7 = _fn7,                                                \
     .ins_type = _type,                                          \
-    .dec_str = _dec_str,\
-    .exec_cb = (exec)_cb}
+    .dec_str = _dec_str,                                        \
+    .exec_cb = _cb}
