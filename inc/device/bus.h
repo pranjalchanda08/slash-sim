@@ -36,8 +36,7 @@ struct peripheral_cfg
 struct bus
 {
     slash_peripheral_cfg_t per_cfg; /* Peripgeral config */
-    // slash_peripheral_api_t api;   /* bus API callback reg */
-    slash_peripheral_t *next;     /* Next bus in the bus LinkedList */
+    slash_peripheral_t *next;       /* Next bus in the bus LinkedList */
 };
 
 rv32_err_t device_tree_register(void);
