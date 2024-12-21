@@ -76,7 +76,7 @@ rv32_err_t peripheral_exec_load(size_t load_addr, size_t len, size_t *value)
     {
         if ((load_addr >= fd->per_cfg.mmio_base) && (load_addr <= (fd->per_cfg.mmio_base + fd->per_cfg.mmio_stride)))
         {
-            err = fd->api.load((load_addr - fd->per_cfg.mmio_base), len, value);
+            err = fd->per_cfg.api_list->load((load_addr - fd->per_cfg.mmio_base), len, value);
             return err;
         }
         fd = fd->next;
@@ -103,7 +103,7 @@ rv32_err_t peripheral_exec_store(size_t store_addr, size_t len, size_t value)
     {
         if ((store_addr >= fd->per_cfg.mmio_base) && (store_addr <= (fd->per_cfg.mmio_base + fd->per_cfg.mmio_stride)))
         {
-            err = fd->api.store((store_addr - fd->per_cfg.mmio_base), len, value);
+            err = fd->per_cfg.api_list->store((store_addr - fd->per_cfg.mmio_base), len, value);
             return err;
         }
         fd = fd->next;
@@ -151,20 +151,20 @@ rv32_err_t peripheral_register(slash_peripheral_cfg_t *cfg)
     peripheral_ptr->per_cfg.mmio_base = cfg->mmio_base;
     peripheral_ptr->per_cfg.mmio_stride = cfg->mmio_stride;
     peripheral_ptr->per_cfg.args = cfg->args;
-    peripheral_ptr->api.init = cfg->api_list->init;
-    peripheral_ptr->api.load = cfg->api_list->load;
-    peripheral_ptr->api.store = cfg->api_list->store;
-    peripheral_ptr->api.deinit = cfg->api_list->deinit;
+    peripheral_ptr->per_cfg.api_list->init = cfg->api_list->init;
+    peripheral_ptr->per_cfg.api_list->load = cfg->api_list->load;
+    peripheral_ptr->per_cfg.api_list->store = cfg->api_list->store;
+    peripheral_ptr->per_cfg.api_list->deinit = cfg->api_list->deinit;
 
     LOG_DEBUG("[BUS]: Added \"%s\" to the address bus: 0x%x, 0x%x",
               peripheral_ptr->per_cfg.name,
               peripheral_ptr->per_cfg.mmio_base,
               peripheral_ptr->per_cfg.mmio_stride);
 
-    if (peripheral_ptr->api.init)
+    if (peripheral_ptr->per_cfg.api_list->init)
     {
         /* Call Init callback */
-        err = peripheral_ptr->api.init(&peripheral_ptr->per_cfg);
+        err = peripheral_ptr->per_cfg.api_list->init(&peripheral_ptr->per_cfg);
     }
 
     return err;
@@ -185,9 +185,9 @@ rv32_err_t peripheral_deregister(char *name)
     {
         if (strcmp(current->per_cfg.name, name) == 0)
         {
-            if (current->api.deinit)
+            if (current->per_cfg.api_list->deinit)
             {
-                current->api.deinit(&current->per_cfg);
+                current->per_cfg.api_list->deinit(&current->per_cfg);
             }
             if (previous == NULL)
             {
