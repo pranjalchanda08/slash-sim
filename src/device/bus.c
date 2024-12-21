@@ -147,14 +147,7 @@ rv32_err_t peripheral_register(slash_peripheral_cfg_t *cfg)
     }
 
     /* Fill all params */
-    peripheral_ptr->per_cfg.name = cfg->name;
-    peripheral_ptr->per_cfg.mmio_base = cfg->mmio_base;
-    peripheral_ptr->per_cfg.mmio_stride = cfg->mmio_stride;
-    peripheral_ptr->per_cfg.args = cfg->args;
-    peripheral_ptr->per_cfg.api_list->init = cfg->api_list->init;
-    peripheral_ptr->per_cfg.api_list->load = cfg->api_list->load;
-    peripheral_ptr->per_cfg.api_list->store = cfg->api_list->store;
-    peripheral_ptr->per_cfg.api_list->deinit = cfg->api_list->deinit;
+    peripheral_ptr->per_cfg = *cfg;
 
     LOG_DEBUG("[BUS]: Added \"%s\" to the address bus: 0x%x, 0x%x",
               peripheral_ptr->per_cfg.name,
